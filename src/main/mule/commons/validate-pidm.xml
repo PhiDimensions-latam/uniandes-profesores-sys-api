@@ -79,7 +79,7 @@ WHERE spbpers_ssn = :id
 					description="No se encontró PIDM para el ID proporcionado." />
 			</when>
 			<otherwise>
-				<set-variable variableName="pidm" doc:name="Set pidm plano"
+				<set-variable variableName="pidm" doc:name="pidm"
 					value="#[vars.SPidm[0].PIDM]" />
 				<logger level="INFO" doc:name="Logger PIDM"
 					message="PIDM obtenido: #[vars.pidm] (tipo: #[vars.tipo])" />

@@ -1,61 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="get-secciones-impl-flow" doc:id="44b9eb3c-9c25-4b3b-b0e3-4ad703880ab2" >
-		<logger level="INFO" doc:name="Logger" doc:id="e0c582a1-1886-4ff3-a75d-c708a243da3c" />
-		<flow-ref doc:name="Flow Reference" doc:id="7673d0f7-01e4-4e24-bba7-1ddb272bb433" />
-		<db:select doc:name="Select" doc:id="ff8caa68-77d0-4ada-9cc8-da0957b32114" config-ref="Database_Config" target="result">
-			<db:sql ><![CDATA[SELECT DISTINCT
-    SFRSTCR_TERM_CODE AS SEMESTRE,
-    SFBETRM_PIDM AS LLAVE_ESTUDIANTE,
-    SFRSTCR_CRN AS CRN,
-    SSBSECT.SSBSECT_SUBJ_CODE AS MATERIA,
-    SSBSECT.SSBSECT_CRSE_NUMB AS CODIGO,
-    SSBSECT.SSBSECT_SEQ_NUMB AS SECCION,
-    SFRSTCR_CREDIT_HR AS CREDS,
-    SFRSTCR_LEVL_CODE AS NIVEL_INSCRIPCION_MATERIA,
-    SFRSTCR_GRDE_CODE_MID AS NOTA_PARCIAL,
-    SFRSTCR_RSTS_CODE AS TIPO_REGISTRO,
-    SFBETRM_ESTS_CODE AS ESTADO_INSCRIPCION,
-    SFRSTCR_ACTIVITY_DATE AS FECHA_ACTIVIDAD
-FROM SFRSTCR
-JOIN SSBSECT ON SFRSTCR_CRN = SSBSECT.SSBSECT_CRN
-JOIN SFBETRM ON SFRSTCR_PIDM = SFBETRM_PIDM
-JOIN SPRIDEN ON SPRIDEN_PIDM = SFRSTCR_PIDM
-WHERE SSBSECT_TERM_CODE = :periodo
-  AND SFRSTCR_TERM_CODE = :periodo
-  AND SFBETRM_TERM_CODE = :periodo
-  AND SFRSTCR_PIDM = :pidm
-  AND SFRSTCR_CRN = :crn
-  AND SFRSTCR_RSTS_CODE IN ('RW','RE')
-  AND SPRIDEN_CHANGE_IND IS NULL]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{
-	'pidm': "9205",
-	'crn': vars.crn,
-	'perido': vars.periodo
-	
-	
-}]]]></db:input-parameters>
-		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="c8b6262d-d5a9-48cc-a120-4fa7fba92c2c" message="#[vars.result]"/>
-		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="92db7dcc-09b6-4d95-927d-42cb01118f00" type="APIKIT:BAD_REQUEST" >
-				<ee:transform doc:name="Transform Message" doc:id="730c14be-bd20-4972-a0ab-23f95b33f107" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
+	<flow name="get-secciones-impl-flow"
+		doc:id="44b9eb3c-9c25-4b3b-b0e3-4ad703880ab2">
+		<logger level="INFO" doc:name="Inicio"
+			doc:id="e0c582a1-1886-4ff3-a75d-c708a243da3c" message="Inicio" />
+		<flow-ref doc:name="validar-parametros-secciones"
+			doc:id="7673d0f7-01e4-4e24-bba7-1ddb272bb433"
+			name="validar-parametros-secciones" />
+		<flow-ref doc:name="validar-pidm" doc:id="fff69d8c-6032-4915-a5a3-5d9bf5e26e39" name="validar-pidm"/>
+		<flow-ref doc:name="obtener-secciones-sql" doc:id="14e9cc2a-71a7-4941-bc21-38715265eb67" name="obtener-secciones-sql"/>
+		<choice doc:name="validar-respuesta-sql" doc:id="6b2cd37f-2348-421c-868b-0e19d7cbd446" >
+			<when expression="#[sizeOf(vars.bodySQLSecciones) == 0]" >
+				<raise-error doc:name="Raise error" doc:id="e3824ee3-eb66-47fb-b1cc-e576d386b0f3" type="CUSTOM:NOT_FOUND" description="No existe registros asociados a la consulta" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Body SQL" doc:id="bb5516b8-b9bd-49a8-9bac-a75fc49cc906" message="#[vars.bodySQL]" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Respuesta /secciones" doc:id="08ea5439-35cd-4c47-8bef-62ea522e53d8">
+		<ee:message>
+    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Bad request"}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-			</on-error-propagate>
-		</error-handler>
+payload map (item) -> {
+  esPrincipal: item.profesorPrincipal,
+  crn: item.crn,
+  dedicacion: item.dedicacionSeccion,
+  responsabilidad: item.responsabilidadSeccion,
+  curso: {
+    nombreCorto: item.nombreCurso,
+    nombreLargo: item.nombreCursoLargo,
+    materia: item.materia,
+    numero: item.numero,
+    seccion: item.seccion
+  }
+}
+]]></ee:set-payload>
+  </ee:message>
+</ee:transform>
+	</flow>
+	<flow name="validar-parametros-secciones" doc:id="a8e6410d-ef5b-42e9-98d6-0d647e66dc11" >
+		<choice doc:name="Validar parametros /secciones" doc:id="2276a38c-8ff7-4c64-abd1-774a0eab237b" >
+			<when expression="#[isEmpty(vars.id)]">
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR" doc:id="c56029e6-d4d5-42fb-a136-732ee646c005" type="CUSTOM:VALIDATION_ERROR" description="El parámetro 'id' es obligatorio para la consulta." />
+			</when>
+			<when expression="#[isEmpty(vars.periodo)]">
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR" doc:id="fb02a5da-13ae-4922-b976-b384a205851a" type="CUSTOM:VALIDATION_ERROR" description="El parámetro 'periodo' es obligatorio para la consulta." />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="parametros validados" doc:id="309ae4b6-b023-483e-8e5b-1904ab3b13b8" message="Parámetros validos" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="obtener-secciones-sql" doc:id="ccdbb759-937b-447a-832e-d4e002aa1d98" >
+		<logger level="INFO" doc:name="Logger" doc:id="7f2a228c-5d11-4a1b-99f3-f6ad536d0418" />
+		<try doc:name="Try" doc:id="6c140a42-3aeb-4448-9f5c-21bfa6ed2f08" >
+			<db:select doc:name="SQL secciones" doc:id="cc257734-acac-40ec-a6d2-6c056cf98e61" config-ref="Database_Config" target="bodySQLSecciones">
+			<db:sql><![CDATA[SELECT DISTINCT 
+	SIRASGN.SIRASGN_TERM_CODE AS PERIODO,
+	SIRASGN.SIRASGN_CRN AS CRN,
+	SIRASGN.SIRASGN_PIDM AS PIDM,
+	F_DOC_IDENT(SIRASGN.SIRASGN_PIDM) AS LLAVE_PROF,
+	SIRASGN.SIRASGN_PRIMARY_IND AS IND_PROF_PRINC,
+	SIRASGN.SIRASGN_PERCENT_RESPONSE AS PORCENTAJE_RESPONSABILIDA,
+	SIRASGN.SIRASGN_PERCENT_SESS AS PORCENTAJE_SESSION,
+	GOBTPAC.GOBTPAC_LDAP_USER AS LOGIN_UNIANDES
+FROM 
+	SIRASGN
+JOIN 
+	SSBSECT ON SIRASGN.SIRASGN_TERM_CODE = SSBSECT.SSBSECT_TERM_CODE 
+	        AND SIRASGN.SIRASGN_CRN = SSBSECT.SSBSECT_CRN
+LEFT JOIN 
+	GOBTPAC ON SIRASGN.SIRASGN_PIDM = GOBTPAC.GOBTPAC_PIDM
+WHERE 
+	SIRASGN.SIRASGN_TERM_CODE = :periodo
+	AND SIRASGN.SIRASGN_PIDM = :pidm
+	AND (:crn IS NULL OR SIRASGN.SIRASGN_CRN = :crn)]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	'pidm': vars.pidm,
+	'crn': vars.crn,
+	'periodo': vars.periodo	
+}]]]></db:input-parameters>
+		</db:select>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e2cfb69-98cd-4222-b7b3-5d94b3547246" type="DB:CONNECTIVITY" >
+					<logger level="INFO" doc:name="Error-conexión-consulta-sql" doc:id="adcc2d48-8c50-4c36-a834-fc27af158907" message="Error de conexión al consultar a la base de datos" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
 	</flow>
 </mule>

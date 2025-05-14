@@ -40,30 +40,6 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\profesores:uniandes-profesores-sys-api-raml-config">
-        <ee:transform doc:name="Transform Message">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  idProfesor: "npena",
-  nombre: "Nancy Peña",
-  productos: [
-    {
-      crn: "12345",
-      dedicacion: "100%",
-      responsabilidad: "50%",
-      profesorPrincipal: true
-    }, 
-    {
-      crn: "67890",
-      dedicacion: "50%",
-      responsabilidad: "30%",
-      profesorPrincipal: false
-    }
-  ]
-} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="profesores-main-implementation-flow" doc:id="f0d3ec24-9dca-46c3-8a5e-78218c284623" name="profesores-main-implementation-flow"/>
     </flow>
 </mule>
