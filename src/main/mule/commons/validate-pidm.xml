@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+	<flow name="validar-pidm" doc:id="60135160-1631-4b44-9c31-2974c6ce09d8">
+
+		<!-- LOG DE ENTRADA -->
+		<logger level="INFO" doc:name="Logger Entrada PIDM"
+			message='ID recibido: #[vars.id]' />
+
+		<!-- TRANSFORM: determinar tipo a partir del contenido de vars.id -->
+		<ee:transform doc:name="Determinar tipo de ID">
+			<ee:variables>
+				<ee:set-variable variableName="tipo"><![CDATA[%dw 2.0
+output application/java
+var id = vars.id as String
+---
+if (id matches /^[0-9]{8,}$/) "snumerodocumento"  // Ej. cédula larga
+else if (id matches /^[0-9]{3,7}$/) "scodigo"     // Código estudiante o profesor
+else "slogin"                                      // Alfanumérico tipo usuario
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+
+		<!-- CONSULTA SQL ÚNICA -->
+		<try doc:name="Consulta PIDM desde ID">
+			<db:select doc:name="Obtener PIDM"
+				config-ref="Database_Config"
+				target="SPidm">
+				<db:sql><![CDATA[
+SELECT gobtpac_pidm AS PIDM
+FROM gobtpac
+WHERE gobtpac_ldap_user = :id
+  AND :tipo = 'slogin'
+UNION ALL
+SELECT spriden_pidm AS PIDM
+FROM spriden
+WHERE spriden_id = :id
+  AND :tipo = 'scodigo'
+UNION ALL
+SELECT spbpers_pidm AS PIDM
+FROM spbpers
+WHERE spbpers_ssn = :id
+  AND :tipo = 'snumerodocumento'
+				]]></db:sql>
+				<db:input-parameters><![CDATA[
+#[
+  {
+    id: vars.id,
+    tipo: vars.tipo
+  }
+]
+]]></db:input-parameters>
+			</db:select>
+
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true"
+					doc:name="Error DB"
+					type="DB:CONNECTIVITY">
+					<logger level="ERROR" doc:name="Logger DB Error"
+						message="Error al consultar PIDM con ID: #[vars.id]" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+
+		<!-- VALIDACIÓN DEL RESULTADO -->
+		<choice doc:name="Validar resultado de PIDM">
+			<when expression="#[isEmpty(vars.SPidm)]">
+				<raise-error doc:name="NOT_FOUND"
+					type="CUSTOM:NOT_FOUND"
+					description="No se encontró PIDM para el ID proporcionado." />
+			</when>
+			<otherwise>
+				<set-variable variableName="pidm" doc:name="Set pidm plano"
+					value="#[vars.SPidm[0].PIDM]" />
+				<logger level="INFO" doc:name="Logger PIDM"
+					message="PIDM obtenido: #[vars.pidm] (tipo: #[vars.tipo])" />
+			</otherwise>
+		</choice>
+
+	</flow>
+</mule>

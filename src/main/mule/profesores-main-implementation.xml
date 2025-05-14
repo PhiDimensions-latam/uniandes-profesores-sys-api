@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="profesores-main-implementation-flow" doc:id="49beab3e-3d55-4283-ab25-08192097f0c2" >
+		<flow-ref doc:name="obtener-recurso-flow" doc:id="008fde98-31e2-45ab-9e43-52d918efe292" name="obtener-recurso-flow"/>
+		<choice doc:name="Choice" doc:id="2ea8c64e-6279-4466-a6df-e31425c9513a" >
+			<when expression='#[vars.recurso == "secciones"]'>
+				<flow-ref doc:name="obtener-parametros-profesores-flow" doc:id="b4862cba-9b84-4283-9105-b3243dec987f" name="obtener-parametros-profesores-flow"/>
+				<flow-ref doc:name="get-secciones-impl-flow" doc:id="921b3306-32fb-4d7f-a900-3cff38f5008e" name="get-secciones-impl-flow"/>
+			</when>
+			<when expression='#[vars.recurso == "producto"]'>
+				<flow-ref doc:name="obtener-parametros-profesores-flow" doc:id="22cea98d-bd3b-46f4-81b3-798af15d62ed" name="obtener-parametros-profesores-flow"/>
+				<flow-ref doc:name="get-producto-impl-flow" doc:id="5b1cbc11-1eb1-4694-ad8c-38724d380508" name="get-producto-impl-flow"/>
+			</when>
+			<when expression='#[vars.recurso == "info"]'>
+				<flow-ref doc:name="obtener-parametros-profesores-flow" doc:id="b410b61b-14f8-41c7-99ca-2a41a37c4614" name="obtener-parametros-profesores-flow"/>
+				<flow-ref doc:name="get-info-impl-flow" doc:id="5e5bad69-7628-4b7f-9016-46e523181bdd" name="get-info-impl-flow"/>
+			</when>
+			<when expression='#[vars.recurso == "academia"]'>
+				<flow-ref doc:name="obtener-parametros-profesores-flow" doc:id="56aec70e-49ee-4604-ac51-a6eace7338fb" name="obtener-parametros-profesores-flow"/>
+				<flow-ref doc:name="get-academia-impl-flow" doc:id="09edf29b-25dc-4751-ba28-7a30edf11794" name="get-academia-impl-flow"/>
+			</when>
+		</choice>
+	</flow>
+	<flow name="obtener-recurso-flow" doc:id="a5eef69c-70a5-42c1-a2d8-706d64448f64" >
+		<set-variable value="#[attributes.queryParams.recurso]" doc:name="recurso" doc:id="f13b36ee-7b9a-4a25-addf-f621a9264a8b" variableName="recurso"/>
+	</flow>
+	<flow name="obtener-parametros-profesores-flow" doc:id="0e8d954e-615f-4642-8a97-50fe9d1ed05c" >
+		<set-variable value="#[attributes.queryParams.id]" doc:name="id" doc:id="9710c531-48a3-4d53-aa04-3a43135ae41d" variableName="id"/>
+		<set-variable value="#[attributes.queryParams.periodo]" doc:name="periodo" doc:id="ec977668-5bb4-47cb-924c-3df65cebd68c" variableName="periodo"/>
+		<set-variable value="#[attributes.queryParams.login]" doc:name="login" doc:id="b48c0e5f-a34d-48eb-a3d6-6d13b46d4507" variableName="login"/>
+		<set-variable value="#[attributes.queryParams.crn]" doc:name="crn" doc:id="6daa561d-7c00-4677-8884-2e0d5b4ecada" variableName="crn"/>
+		<set-variable value="#[attributes.queryParams.idProfesor]" doc:name="idProfesor" doc:id="d1e63a7a-f27c-46d1-90ed-57e33f3e236c" variableName="idProfesor"/>
+		<set-variable value="#[attributes.queryParams.start]" doc:name="start" doc:id="ad1eb518-4969-4f07-88e3-6119a91290d2" variableName="start"/>
+		<set-variable value="#[attributes.queryParams.limit]" doc:name="limit" doc:id="b970128a-8655-45ad-98ef-70bf28b7718e" variableName="limit"/>
+	</flow>
+</mule>

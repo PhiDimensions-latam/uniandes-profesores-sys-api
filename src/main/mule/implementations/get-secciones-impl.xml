@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-secciones-impl-flow" doc:id="44b9eb3c-9c25-4b3b-b0e3-4ad703880ab2" >
+		<logger level="INFO" doc:name="Logger" doc:id="e0c582a1-1886-4ff3-a75d-c708a243da3c" />
+		<db:select doc:name="Select" doc:id="ff8caa68-77d0-4ada-9cc8-da0957b32114" config-ref="Database_Config" target="result">
+			<db:sql ><![CDATA[SELECT DISTINCT
+    SFRSTCR_TERM_CODE AS SEMESTRE,
+    SFBETRM_PIDM AS LLAVE_ESTUDIANTE,
+    SFRSTCR_CRN AS CRN,
+    SSBSECT.SSBSECT_SUBJ_CODE AS MATERIA,
+    SSBSECT.SSBSECT_CRSE_NUMB AS CODIGO,
+    SSBSECT.SSBSECT_SEQ_NUMB AS SECCION,
+    SFRSTCR_CREDIT_HR AS CREDS,
+    SFRSTCR_LEVL_CODE AS NIVEL_INSCRIPCION_MATERIA,
+    SFRSTCR_GRDE_CODE_MID AS NOTA_PARCIAL,
+    SFRSTCR_RSTS_CODE AS TIPO_REGISTRO,
+    SFBETRM_ESTS_CODE AS ESTADO_INSCRIPCION,
+    SFRSTCR_ACTIVITY_DATE AS FECHA_ACTIVIDAD
+FROM SFRSTCR
+JOIN SSBSECT ON SFRSTCR_CRN = SSBSECT.SSBSECT_CRN
+JOIN SFBETRM ON SFRSTCR_PIDM = SFBETRM_PIDM
+JOIN SPRIDEN ON SPRIDEN_PIDM = SFRSTCR_PIDM
+WHERE SSBSECT_TERM_CODE = :periodo
+  AND SFRSTCR_TERM_CODE = :periodo
+  AND SFBETRM_TERM_CODE = :periodo
+  AND SFRSTCR_PIDM = :pidm
+  AND SFRSTCR_CRN = :crn
+  AND SFRSTCR_RSTS_CODE IN ('RW','RE')
+  AND SPRIDEN_CHANGE_IND IS NULL]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'pidm': "9205",
+	'crn': vars.crn,
+	'perido': vars.periodo
+	
+	
+}]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="c8b6262d-d5a9-48cc-a120-4fa7fba92c2c" message="#[vars.result]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="92db7dcc-09b6-4d95-927d-42cb01118f00" type="APIKIT:BAD_REQUEST" >
+				<ee:transform doc:name="Transform Message" doc:id="730c14be-bd20-4972-a0ab-23f95b33f107" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

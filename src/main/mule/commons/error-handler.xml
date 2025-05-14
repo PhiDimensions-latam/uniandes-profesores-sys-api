@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler
+		name="errorError_Handler"
+		doc:id="795ba5b6-17e0-4d38-a3e1-a0cd594e148e">
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="744ea8d4-8b94-466d-9962-431a670eb756"
+			type="APIKIT:BAD_REQUEST">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="7d88ff24-9357-4433-a5d3-d03cece863b9">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="5b50c892-be5e-4cb8-a36e-458f574ea8c0"
+			type="APIKIT:NOT_FOUND">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="d95fdd74-72c9-448c-bf53-ed98992ef369">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="24fe35c7-49e9-4c8a-9e9d-09479ab0aad4"
+			type="APIKIT:METHOD_NOT_ALLOWED">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="62ef56fd-a162-4144-ab2a-2966fd748d23">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="244f4e31-bba2-4c26-9f66-e0177b9a4a83"
+			type="APIKIT:NOT_ACCEPTABLE">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="15737638-688e-4774-9a17-fc625f3c7c0c">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="467e1115-ad77-4210-ab86-aa75ccbe1b75"
+			type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="745c28c6-5176-43cf-bb88-ea70b1c91c75">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="bf11dbc5-3c1d-4118-930d-b2803eea3746"
+			type="APIKIT:NOT_IMPLEMENTED">
+			<ee:transform
+				doc:name="Transform Message"
+				doc:id="27bbd20f-5488-4593-ad7f-1ed77695ecba">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="66118ab9-cceb-4501-9df2-d5f8269a94b1"
+			type="CUSTOM:VALIDATION_ERROR">
+			<ee:transform
+				doc:name="BAD_REQUEST"
+				doc:id="bb5c703e-c4cd-4c54-9395-29474508aef5">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{	
+	code: 400,
+	message: error.description
+}&#93;&#93;></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform
+				doc:name="httpStatus"
+				doc:id="52a97b8d-3c50-43bb-aaaa-f5535fd59579">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload.code&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate> [STUDIO] -->
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="de9d4aae-2c84-468a-9e84-d86c8c51e862"
+			type="CUSTOM:NOT_FOUND">
+			<ee:transform
+				doc:name="NOT_FOUND"
+				doc:id="80beb4e2-f822-4991-8de8-413c03493df6">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{	
+	code: 404,
+	message: error.description
+}&#93;&#93;></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform
+				doc:name="httpStatus"
+				doc:id="9dd1189f-36ba-404b-965e-73746a306014">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload.code&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate> [STUDIO] -->
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate"
+			doc:id="73915052-5d42-45b6-939b-30b81bc750dc"
+			type="DB:CONNECTIVITY">
+			<ee:transform
+				doc:name="NOT_FOUND"
+				doc:id="1e1edd92-aacd-4643-accf-228587b3c4b7">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{	
+	code: 500,
+	message: error.description
+}&#93;&#93;></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform
+				doc:name="httpStatus"
+				doc:id="c2a2bcaa-879e-4cb4-a11e-e5295c4f0a66">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload.code&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate> [STUDIO] -->
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bf055042-5454-4cd8-bae8-09e1e251e0fa" type="HTTP:NOT_FOUND">
+			<ee:transform doc:name="NOT_FOUND" doc:id="840f8c03-6153-40d9-81d8-332325d97dd1" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{	
+	code: 404,
+	message: error.description
+}&#93;&#93;></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform doc:name="httpStatus" doc:id="5df8e57d-a16c-435f-b745-8869c882abe1" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload.code&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate> [STUDIO] -->
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df58f1c6-49b6-4590-ac8b-6c569045b49d" type="HTTP:BASIC_AUTHENTICATION">
+			<ee:transform doc:name="BASIC_AUTHENTICATION" doc:id="5b4e202f-c520-43ee-bed0-045f0f855e95" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{	
+	code: 401,
+	message: error.description
+}&#93;&#93;></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform doc:name="httpStatus" doc:id="cf217121-7b3c-4d84-a468-37c8e987effc" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload.code&#93;&#93;></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate> [STUDIO] -->
+	</error-handler>
+</mule>

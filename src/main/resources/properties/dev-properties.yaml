@@ -1,0 +1,16 @@
+dataBaseConfig:
+  host: "occprodsbx19.uniandes.edu.co"
+  port: "1571"
+  user: "SAPPI"
+  serviceName: "prodsbx.uniandes.edu.co"
+  
+requestConfig:
+  protocol: "HTTPS"
+  host: "academia.uniandes.edu.co"
+  port: ""
+  basePath: "/WebServicesAcademy/api"
+  path: "/professors"
+  maxConnections: "-1"
+  connectionIdleTimeout: "30000"
+  responseBufferSize: "1024"
+  

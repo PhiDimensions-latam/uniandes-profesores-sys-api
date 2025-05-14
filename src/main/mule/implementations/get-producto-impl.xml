@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="get-producto-impl-flow" doc:id="5fc46700-7d5a-4880-9c2e-75e402ab2de5" >
+		<logger level="INFO" doc:name="Logger" doc:id="38774580-d7eb-4d9c-be62-69946260637b" />
+	</flow>
+</mule>
