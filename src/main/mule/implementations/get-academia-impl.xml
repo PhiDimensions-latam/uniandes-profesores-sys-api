@@ -4,6 +4,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 	<flow name="get-academia-impl-flow" doc:id="826934d9-dd0d-422b-93a7-3a0aafa954b9" >
-		<logger level="INFO" doc:name="Logger" doc:id="ae436e17-dc85-4fa6-afa8-340ed0385dad" />
+		<logger level="INFO" doc:name="Info" doc:id="ae436e17-dc85-4fa6-afa8-340ed0385dad" />
+		<flow-ref doc:name="validar-start-limit" doc:id="a68daa54-afcd-43a0-a4d7-d7a9b840c944" name="validar-start-limit"/>
 	</flow>
+	<sub-flow name="validar-start-limit" doc:id="a38c0dea-234d-46e9-9638-cb9fbb9d13d5" >
+		<set-variable value="#[if(isEmpty(vars.start) or vars.start == null)0 else vars.start]" doc:name="start" doc:id="bfd75dc1-0ee0-4b5e-b767-2eff764b4800" variableName="start"/>
+		<set-variable value="#[if(isEmpty(vars.limit) or vars.limit == null) 20 else vars.limit]" doc:name="limit" doc:id="8508384f-509a-4725-a97a-9ccd4de695a9" variableName="limit" />
+	</sub-flow>
+	<sub-flow name="obtener-profesores-academia-sql" doc:id="84ac6c14-d3df-45d4-a620-12bd4b602375" />
 </mule>
