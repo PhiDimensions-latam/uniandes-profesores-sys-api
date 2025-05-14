@@ -40,6 +40,6 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\profesores:uniandes-profesores-sys-api-raml-config">
-		<flow-ref doc:name="profesores-main-implementation-flow" doc:id="2a756b9a-f11b-40b0-838a-78928edb3716" name="profesores-main-implementation-flow"/>
+		<flow-ref doc:name="profesores-main-implementation-flow" doc:id="f0d3ec24-9dca-46c3-8a5e-78218c284623" name="profesores-main-implementation-flow"/>
     </flow>
 </mule>

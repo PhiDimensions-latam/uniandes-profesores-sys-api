@@ -130,7 +130,7 @@ output application/json
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+		<on-error-propagate
 			enableNotifications="true"
 			logException="true"
 			doc:name="On Error Propagate"
@@ -142,14 +142,14 @@ output application/json
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
+---
 {	
 	code: 400,
 	message: error.description
-}&#93;&#93;></ee:set-payload>
+}]]></ee:set-payload>
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[400&#93;&#93;></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 			<ee:transform
@@ -159,12 +159,12 @@ output application/json
 				<ee:variables>
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
-payload.code&#93;&#93;></ee:set-variable>
+---
+payload.code]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</on-error-propagate> [STUDIO] -->
-		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+		</on-error-propagate>
+		<on-error-propagate
 			enableNotifications="true"
 			logException="true"
 			doc:name="On Error Propagate"
@@ -176,11 +176,11 @@ payload.code&#93;&#93;></ee:set-variable>
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
+---
 {	
 	code: 404,
 	message: error.description
-}&#93;&#93;></ee:set-payload>
+}]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
 			<ee:transform
@@ -190,12 +190,12 @@ output application/json
 				<ee:variables>
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
-payload.code&#93;&#93;></ee:set-variable>
+---
+payload.code]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</on-error-propagate> [STUDIO] -->
-		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate
+		</on-error-propagate>
+		<on-error-propagate
 			enableNotifications="true"
 			logException="true"
 			doc:name="On Error Propagate"
@@ -207,11 +207,11 @@ payload.code&#93;&#93;></ee:set-variable>
 				<ee:message>
 					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
+---
 {	
 	code: 500,
 	message: error.description
-}&#93;&#93;></ee:set-payload>
+}]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
 			<ee:transform
@@ -221,21 +221,21 @@ output application/json
 				<ee:variables>
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
-payload.code&#93;&#93;></ee:set-variable>
+---
+payload.code]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</on-error-propagate> [STUDIO] -->
-		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bf055042-5454-4cd8-bae8-09e1e251e0fa" type="HTTP:NOT_FOUND">
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bf055042-5454-4cd8-bae8-09e1e251e0fa" type="HTTP:NOT_FOUND">
 			<ee:transform doc:name="NOT_FOUND" doc:id="840f8c03-6153-40d9-81d8-332325d97dd1" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
+---
 {	
 	code: 404,
 	message: error.description
-}&#93;&#93;></ee:set-payload>
+}]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
 			<ee:transform doc:name="httpStatus" doc:id="5df8e57d-a16c-435f-b745-8869c882abe1" >
@@ -243,21 +243,21 @@ output application/json
 				<ee:variables >
 					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
-payload.code&#93;&#93;></ee:set-variable>
+---
+payload.code]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</on-error-propagate> [STUDIO] -->
-		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df58f1c6-49b6-4590-ac8b-6c569045b49d" type="HTTP:BASIC_AUTHENTICATION">
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df58f1c6-49b6-4590-ac8b-6c569045b49d" type="HTTP:BASIC_AUTHENTICATION">
 			<ee:transform doc:name="BASIC_AUTHENTICATION" doc:id="5b4e202f-c520-43ee-bed0-045f0f855e95" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
+---
 {	
 	code: 401,
 	message: error.description
-}&#93;&#93;></ee:set-payload>
+}]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
 			<ee:transform doc:name="httpStatus" doc:id="cf217121-7b3c-4d84-a468-37c8e987effc" >
@@ -265,10 +265,10 @@ output application/json
 				<ee:variables >
 					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
-&#45;&#45;-
-payload.code&#93;&#93;></ee:set-variable>
+---
+payload.code]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</on-error-propagate> [STUDIO] -->
+		</on-error-propagate>
 	</error-handler>
 </mule>
