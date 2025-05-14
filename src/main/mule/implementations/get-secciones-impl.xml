@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="get-secciones-impl-flow" doc:id="44b9eb3c-9c25-4b3b-b0e3-4ad703880ab2" >
 		<logger level="INFO" doc:name="Logger" doc:id="e0c582a1-1886-4ff3-a75d-c708a243da3c" />
-		<flow-ref doc:name="Flow Reference" doc:id="7673d0f7-01e4-4e24-bba7-1ddb272bb433" />
+		<!-- [STUDIO:"Flow Reference"]<flow-ref doc:name="Flow Reference" doc:id="7673d0f7-01e4-4e24-bba7-1ddb272bb433" /> [STUDIO] -->
 		<db:select doc:name="Select" doc:id="ff8caa68-77d0-4ada-9cc8-da0957b32114" config-ref="Database_Config" target="result">
 			<db:sql ><![CDATA[SELECT DISTINCT
     SFRSTCR_TERM_CODE AS SEMESTRE,
