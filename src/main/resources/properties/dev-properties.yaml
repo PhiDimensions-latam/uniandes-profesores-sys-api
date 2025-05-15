@@ -10,6 +10,7 @@ requestConfig:
   port: ""
   basePath: "/WebServicesAcademy/api"
   path: "/professors"
+  pathProducts: "/products"
   maxConnections: "-1"
   connectionIdleTimeout: "30000"
   responseBufferSize: "1024"
