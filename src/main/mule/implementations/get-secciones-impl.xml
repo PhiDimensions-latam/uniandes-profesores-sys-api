@@ -5,96 +5,185 @@
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="get-secciones-impl-flow"
-		doc:id="44b9eb3c-9c25-4b3b-b0e3-4ad703880ab2">
-		<logger level="INFO" doc:name="Inicio"
-			doc:id="e0c582a1-1886-4ff3-a75d-c708a243da3c" message="Inicio" />
+	xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<flow name="get-secciones-impl-flow">
+		<logger level="INFO" doc:name="Inicio" message="Inicio" />
+
 		<flow-ref doc:name="validar-parametros-secciones"
-			doc:id="7673d0f7-01e4-4e24-bba7-1ddb272bb433"
 			name="validar-parametros-secciones" />
-		<flow-ref doc:name="validar-pidm" doc:id="fff69d8c-6032-4915-a5a3-5d9bf5e26e39" name="validar-pidm"/>
-		<flow-ref doc:name="obtener-secciones-sql" doc:id="14e9cc2a-71a7-4941-bc21-38715265eb67" name="obtener-secciones-sql"/>
-		<choice doc:name="validar-respuesta-sql" doc:id="6b2cd37f-2348-421c-868b-0e19d7cbd446" >
-			<when expression="#[sizeOf(vars.bodySQLSecciones) == 0]" >
-				<raise-error doc:name="Raise error" doc:id="e3824ee3-eb66-47fb-b1cc-e576d386b0f3" type="CUSTOM:NOT_FOUND" description="No existe registros asociados a la consulta" />
+		<flow-ref doc:name="validar-pidm" name="validar-pidm" />
+		<flow-ref doc:name="obtener-secciones-sql"
+			name="obtener-secciones-sql" />
+
+		<choice doc:name="validar-respuesta-sql">
+			<when
+				expression="#[sizeOf(vars.bodySQLSecciones default []) == 0]">
+				<raise-error doc:name="Raise error"
+					type="CUSTOM:NOT_FOUND"
+					description="No existe registros asociados a la consulta" />
 			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Body SQL" doc:id="bb5516b8-b9bd-49a8-9bac-a75fc49cc906" message="#[vars.bodySQL]" />
+			<otherwise>
+				<logger level="INFO" doc:name="Validación exitosa"
+					doc:id="42143d44-7287-49e3-9eb4-555009a16c38"
+					message="Validación exitosa." />
 			</otherwise>
 		</choice>
-		<ee:transform doc:name="Respuesta /secciones" doc:id="08ea5439-35cd-4c47-8bef-62ea522e53d8">
-		<ee:message>
-    <ee:set-payload><![CDATA[%dw 2.0
+
+		<set-variable variableName="listaSecciones" value="#[[]]"
+			doc:name="listaSecciones" />
+
+		<foreach collection="#[vars.bodySQLSecciones]"
+			doc:name="Enriquecer datos curso">
+			<db:select doc:name="Datos del curso"
+				config-ref="Database_Config" target="datosCurso">
+				<db:sql><![CDATA[
+    SELECT
+        SSBSECT.SSBSECT_TERM_CODE AS PERIODO,
+        SSBSECT.SSBSECT_CRN AS CRN,
+        SCBCRSE.SCBCRSE_TITLE AS NOMBRE_CURSO,
+        t_scrsyln.nom_cur_largo AS NOMBRE_CURSO_LARGO,
+        SSBSECT.SSBSECT_SUBJ_CODE AS MATERIA,
+        SSBSECT.SSBSECT_CRSE_NUMB AS NUMERO,
+        SSBSECT.SSBSECT_SEQ_NUMB AS SECCION
+    FROM
+        SSBSECT
+    JOIN SCBCRSE
+        ON SSBSECT.SSBSECT_SUBJ_CODE = SCBCRSE.SCBCRSE_SUBJ_CODE
+        AND SSBSECT.SSBSECT_CRSE_NUMB = SCBCRSE.SCBCRSE_CRSE_NUMB
+    LEFT JOIN (
+        SELECT
+            a.SCRSYLN_LONG_COURSE_TITLE AS nom_cur_largo,
+            a.SCRSYLN_SUBJ_CODE || a.SCRSYLN_CRSE_NUMB AS code
+        FROM SCRSYLN a
+        WHERE a.SCRSYLN_TERM_CODE_EFF = (
+            SELECT MAX(b.SCRSYLN_TERM_CODE_EFF)
+            FROM SCRSYLN b
+            WHERE b.SCRSYLN_SUBJ_CODE = a.SCRSYLN_SUBJ_CODE
+            AND b.SCRSYLN_CRSE_NUMB = a.SCRSYLN_CRSE_NUMB
+        )
+    ) t_scrsyln
+        ON SCBCRSE.SCBCRSE_SUBJ_CODE || SCBCRSE.SCBCRSE_CRSE_NUMB = t_scrsyln.code
+    WHERE
+        SSBSECT.SSBSECT_TERM_CODE = :periodo
+        AND SSBSECT.SSBSECT_CRN = :crn
+        AND SCBCRSE.SCBCRSE_EFF_TERM = (
+            SELECT MAX(cr2.SCBCRSE_EFF_TERM)
+            FROM SCBCRSE cr2
+            WHERE cr2.SCBCRSE_EFF_TERM <= :periodo
+            AND cr2.SCBCRSE_SUBJ_CODE = SSBSECT.SSBSECT_SUBJ_CODE
+            AND cr2.SCBCRSE_CRSE_NUMB = SSBSECT.SSBSECT_CRSE_NUMB
+        )
+]]></db:sql>
+				<db:input-parameters><![CDATA[#[{
+                    periodo: vars.periodo,
+                    crn: payload.CRN
+                }]]]></db:input-parameters>
+			</db:select>
+
+			<ee:transform doc:name="Construir item enriquecido">
+				<ee:variables>
+					<ee:set-variable variableName="seccionEnriquecida"><![CDATA[%dw 2.0
+output application/java
+var datos = if (!isEmpty(vars.datosCurso)) vars.datosCurso[0] else {}
+---
+{
+  profesorPrincipal: payload.IND_PROF_PRINC == "Y",
+  dedicacionSeccion: (payload.PORCENTAJE_SESSION default null) as String,
+  responsabilidadSeccion: (payload.PORCENTAJE_RESPONSABILIDA default null) as String,
+  crn: (payload.CRN default null) as String,
+  nombreCurso: (datos.NOMBRE_CURSO default null) as String,
+  nombreCursoLargo: (datos.NOMBRE_CURSO_LARGO default null) as String,
+  materia: (datos.MATERIA default null) as String,
+  numero: (datos.NUMERO default null) as String,
+  seccion: (datos.SECCION default null) as String
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+
+			<set-variable variableName="listaSecciones"
+				value="#[(vars.listaSecciones default []) ++ [vars.seccionEnriquecida]]"
+				doc:name="listaSecciones" />
+		</foreach>
+
+		<ee:transform doc:name="Response /secciones">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-payload map (item) -> {
-  esPrincipal: item.profesorPrincipal,
-  crn: item.crn,
-  dedicacion: item.dedicacionSeccion,
-  responsabilidad: item.responsabilidadSeccion,
-  curso: {
-    nombreCorto: item.nombreCurso,
-    nombreLargo: item.nombreCursoLargo,
-    materia: item.materia,
-    numero: item.numero,
-    seccion: item.seccion
-  }
-}
+vars.listaSecciones
 ]]></ee:set-payload>
-  </ee:message>
-</ee:transform>
+			</ee:message>
+		</ee:transform>
 	</flow>
-	<flow name="validar-parametros-secciones" doc:id="a8e6410d-ef5b-42e9-98d6-0d647e66dc11" >
-		<choice doc:name="Validar parametros /secciones" doc:id="2276a38c-8ff7-4c64-abd1-774a0eab237b" >
+
+	<flow name="validar-parametros-secciones">
+		<choice doc:name="Validar parametros /secciones">
 			<when expression="#[isEmpty(vars.id)]">
-				<raise-error doc:name="CUSTOM:VALIDATION_ERROR" doc:id="c56029e6-d4d5-42fb-a136-732ee646c005" type="CUSTOM:VALIDATION_ERROR" description="El parámetro 'id' es obligatorio para la consulta." />
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
+					type="CUSTOM:VALIDATION_ERROR"
+					description="El parámetro 'id' es obligatorio para la consulta." />
 			</when>
 			<when expression="#[isEmpty(vars.periodo)]">
-				<raise-error doc:name="CUSTOM:VALIDATION_ERROR" doc:id="fb02a5da-13ae-4922-b976-b384a205851a" type="CUSTOM:VALIDATION_ERROR" description="El parámetro 'periodo' es obligatorio para la consulta." />
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
+					type="CUSTOM:VALIDATION_ERROR"
+					description="El parámetro 'periodo' es obligatorio para la consulta." />
 			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="parametros validados" doc:id="309ae4b6-b023-483e-8e5b-1904ab3b13b8" message="Parámetros validos" />
+			<otherwise>
+				<logger level="INFO" doc:name="Parámetros validados"
+					message="Parámetros validados: ID #[vars.id], periodo #[vars.periodo], crn #[vars.crn] (empty: #[isEmpty(vars.crn)])" />
 			</otherwise>
 		</choice>
 	</flow>
-	<flow name="obtener-secciones-sql" doc:id="ccdbb759-937b-447a-832e-d4e002aa1d98" >
-		<logger level="INFO" doc:name="Logger" doc:id="7f2a228c-5d11-4a1b-99f3-f6ad536d0418" />
-		<try doc:name="Try" doc:id="6c140a42-3aeb-4448-9f5c-21bfa6ed2f08" >
-			<db:select doc:name="SQL secciones" doc:id="cc257734-acac-40ec-a6d2-6c056cf98e61" config-ref="Database_Config" target="bodySQLSecciones">
-			<db:sql><![CDATA[SELECT DISTINCT 
-	SIRASGN.SIRASGN_TERM_CODE AS PERIODO,
-	SIRASGN.SIRASGN_CRN AS CRN,
-	SIRASGN.SIRASGN_PIDM AS PIDM,
-	F_DOC_IDENT(SIRASGN.SIRASGN_PIDM) AS LLAVE_PROF,
-	SIRASGN.SIRASGN_PRIMARY_IND AS IND_PROF_PRINC,
-	SIRASGN.SIRASGN_PERCENT_RESPONSE AS PORCENTAJE_RESPONSABILIDA,
-	SIRASGN.SIRASGN_PERCENT_SESS AS PORCENTAJE_SESSION,
-	GOBTPAC.GOBTPAC_LDAP_USER AS LOGIN_UNIANDES
+
+	<flow name="obtener-secciones-sql">
+		<logger level="INFO" doc:name="Logger antes SQL"
+			message="pidm: #[vars.pidm], id: #[vars.id], periodo: #[vars.periodo], crn: #[vars.crn]" />
+		<try doc:name="Try">
+			<db:select doc:name="SQL secciones"
+				config-ref="Database_Config" target="bodySQLSecciones">
+				<db:sql><![CDATA[
+SELECT DISTINCT 
+    SIRASGN.SIRASGN_TERM_CODE AS PERIODO,
+    SIRASGN.SIRASGN_CRN AS CRN,
+    SIRASGN.SIRASGN_PIDM AS PIDM,
+    F_DOC_IDENT(SIRASGN.SIRASGN_PIDM) AS LLAVE_PROF,
+    SIRASGN.SIRASGN_PRIMARY_IND AS IND_PROF_PRINC,
+    SIRASGN.SIRASGN_PERCENT_RESPONSE AS PORCENTAJE_RESPONSABILIDA,
+    SIRASGN.SIRASGN_PERCENT_SESS AS PORCENTAJE_SESSION,
+    GOBTPAC.GOBTPAC_LDAP_USER AS LOGIN_UNIANDES
 FROM 
-	SIRASGN
-JOIN 
-	SSBSECT ON SIRASGN.SIRASGN_TERM_CODE = SSBSECT.SSBSECT_TERM_CODE 
-	        AND SIRASGN.SIRASGN_CRN = SSBSECT.SSBSECT_CRN
-LEFT JOIN 
-	GOBTPAC ON SIRASGN.SIRASGN_PIDM = GOBTPAC.GOBTPAC_PIDM
+    SIRASGN,
+    SSBSECT,
+    GOBTPAC
 WHERE 
-	SIRASGN.SIRASGN_TERM_CODE = :periodo
-	AND SIRASGN.SIRASGN_PIDM = :pidm
-	AND (:crn IS NULL OR SIRASGN.SIRASGN_CRN = :crn)]]></db:sql>
-			<db:input-parameters><![CDATA[#[{
-	'pidm': vars.pidm,
-	'crn': vars.crn,
-	'periodo': vars.periodo	
+    SIRASGN.SIRASGN_TERM_CODE = :periodo
+    AND SSBSECT.SSBSECT_TERM_CODE = :periodo
+    AND SIRASGN.SIRASGN_TERM_CODE = SSBSECT.SSBSECT_TERM_CODE
+    AND SIRASGN.SIRASGN_CRN = SSBSECT.SSBSECT_CRN
+    AND SIRASGN.SIRASGN_PIDM = GOBTPAC.GOBTPAC_PIDM(+)
+    AND SIRASGN.SIRASGN_PIDM = :pidm
+    AND (:crn IS NULL OR SIRASGN.SIRASGN_CRN = :crn)
+                ]]></db:sql>
+				<db:input-parameters><![CDATA[#[{
+    pidm: vars.pidm,
+    crn: if (isEmpty(vars.crn)) null else vars.crn,
+    periodo: vars.periodo
 }]]]></db:input-parameters>
-		</db:select>
-			<error-handler >
-				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e2cfb69-98cd-4222-b7b3-5d94b3547246" type="DB:CONNECTIVITY" >
-					<logger level="INFO" doc:name="Error-conexión-consulta-sql" doc:id="adcc2d48-8c50-4c36-a834-fc27af158907" message="Error de conexión al consultar a la base de datos" />
+			</db:select>
+
+			<error-handler>
+				<on-error-propagate enableNotifications="true"
+					logException="true" doc:name="On Error Propagate"
+					type="DB:CONNECTIVITY">
+					<logger level="INFO" doc:name="Error SQL"
+						message="Error de conexión al consultar a la base de datos" />
 				</on-error-propagate>
 			</error-handler>
 		</try>
 	</flow>
+
 </mule>

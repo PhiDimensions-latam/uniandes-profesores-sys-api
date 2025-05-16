@@ -1,9 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	<flow name="get-info-impl-flow" doc:id="b23ac036-ec35-4da2-94e1-a11895fdfc35" >
-		<logger level="INFO" doc:name="Logger" doc:id="533ace37-f1e4-4f00-92ac-d5b455f4edb9" />
+	xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+
+	<flow name="get-info-impl-flow"
+		doc:name="Flujo - Informacion Doctoral por CodeStudent"
+		doc:id="b1f52edb-92ed-4c78-8f72-eae9ba4ec63a">
+
+		<flow-ref doc:name="validar-parametro-info"
+			doc:id="38000b93-e2a3-4d4d-86b5-5184db92fe18"
+			name="validar-parametro-info" />
+		<http:request method="GET"
+			config-ref="HTTP_Request_configuration"
+			doc:name="Llamar servicio PhD" path="${requestConfig.path}"
+			target="SQLInfo" sendBodyMode="ALWAYS">
+			<http:query-params><![CDATA[#[{
+  username: vars.login
+}]]]></http:query-params>
+		</http:request>
+
+		<logger level="INFO" doc:name="Logger"
+			doc:id="bd3ebf2c-14e9-411d-93df-f1bcd1e4021a"
+			message="#[output application/json --- vars.SQLInfo]" />
+		<choice doc:name="Validar total de estudiantes">
+			<when
+				expression="#[isEmpty(vars.SQLInfo.faculties) or sizeOf(vars.SQLInfo.faculties) == 0]">
+				<raise-error doc:name="Sin resultados"
+					type="CUSTOM:NOT_FOUND"
+					description="No se encontraron estudiantes doctorales para los criterios dados." />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Respuesta valida"
+					doc:id="a5d0f8a3-34b9-42b6-a6f5-251151692ef4"
+					message="#[vars.SQLInfo]" />
+				<ee:transform doc:name="response /info"
+					doc:id="70ea11b6-17d4-44c8-bb4f-75c04df57cf5">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.SQLInfo
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+
+			</otherwise>
+
+		</choice>
 	</flow>
+	<flow name="validar-parametro-info"
+		doc:id="3278405b-5861-4fd5-8ff8-8045fc378535">
+		<choice doc:name="Validar parámetro">
+			<when expression="#[isEmpty(vars.login)]">
+				<raise-error type="CUSTOM:VALIDATION_ERROR"
+					description="Se necesita el parámetro correspondiente a 'login' para realizar la petición."
+					doc:name="Error codeStudent" />
+			</when>
+
+			<otherwise>
+				<!-- Continúa con el flujo si pasa todas las validaciones -->
+				<logger level="INFO" doc:name="Validación Exitosa"
+					doc:id="51e01caf-abab-4422-8bc4-6b42ad75f87b"
+					message="Validación Exitosa" />
+			</otherwise>
+		</choice>
+
+	</flow>
+
+
 </mule>
