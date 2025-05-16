@@ -1,46 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<flow name="get-academia-impl-flow" doc:id="826934d9-dd0d-422b-93a7-3a0aafa954b9" >
-		<logger level="INFO" doc:name="Info" doc:id="ae436e17-dc85-4fa6-afa8-340ed0385dad" />
-		<flow-ref doc:name="validar-start-limit" doc:id="a68daa54-afcd-43a0-a4d7-d7a9b840c944" name="validar-start-limit"/>
-		<flow-ref doc:name="obtener-profesores-academia-sql" doc:id="76fe313f-abbe-4483-97ea-fd2894ffc9d8" name="obtener-profesores-academia-sql"/>
-		<choice doc:name="Choice" doc:id="00ac9e3d-3d11-45be-9943-324db753d7a2" >
-			<when expression="#[sizeOf(payload) == 0]" >
-				<raise-error doc:name="Raise error" doc:id="da957d99-4b0f-4802-ae16-bea21e908461" type="CUSTOM:NOT_FOUND" description="No existe registros asociados a la consulta " />
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-academia-impl-flow"
+		doc:id="826934d9-dd0d-422b-93a7-3a0aafa954b9">
+		<logger level="INFO" doc:name="Info"
+			doc:id="ae436e17-dc85-4fa6-afa8-340ed0385dad" />
+		<flow-ref doc:name="validar-start-limit"
+			doc:id="a68daa54-afcd-43a0-a4d7-d7a9b840c944"
+			name="validar-start-limit" />
+		<flow-ref doc:name="obtener-profesores-academia-sql"
+			doc:id="76fe313f-abbe-4483-97ea-fd2894ffc9d8"
+			name="obtener-profesores-academia-sql" />
+		<choice doc:name="Choice"
+			doc:id="00ac9e3d-3d11-45be-9943-324db753d7a2">
+			<when expression="#[sizeOf(payload) == 0]">
+				<raise-error doc:name="Raise error"
+					doc:id="da957d99-4b0f-4802-ae16-bea21e908461"
+					type="CUSTOM:NOT_FOUND"
+					description="No existe registros asociados a la consulta " />
 			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Body SQL" doc:id="3d007a20-9373-444a-9271-77665d1770c2" message='#[payload]' />
+			<otherwise>
+				<logger level="INFO" doc:name="Body SQL"
+					doc:id="3d007a20-9373-444a-9271-77665d1770c2" message='#[payload]' />
 			</otherwise>
 		</choice>
 	</flow>
-	<sub-flow name="validar-start-limit" doc:id="a38c0dea-234d-46e9-9638-cb9fbb9d13d5" >
-		<set-variable value="#[if(isEmpty(vars.start) or vars.start == null)0 else vars.start]" doc:name="start" doc:id="bfd75dc1-0ee0-4b5e-b767-2eff764b4800" variableName="start"/>
-		<set-variable value="#[if(isEmpty(vars.limit) or vars.limit == null) 20 else vars.limit]" doc:name="limit" doc:id="8508384f-509a-4725-a97a-9ccd4de695a9" variableName="limit" />
+	<sub-flow name="validar-start-limit"
+		doc:id="a38c0dea-234d-46e9-9638-cb9fbb9d13d5">
+		<set-variable
+			value="#[if(isEmpty(vars.start) or vars.start == null)0 else vars.start]"
+			doc:name="start" doc:id="bfd75dc1-0ee0-4b5e-b767-2eff764b4800"
+			variableName="start" />
+		<set-variable
+			value="#[if(isEmpty(vars.limit) or vars.limit == null) 20 else vars.limit]"
+			doc:name="limit" doc:id="8508384f-509a-4725-a97a-9ccd4de695a9"
+			variableName="limit" />
 	</sub-flow>
-	<sub-flow name="obtener-profesores-academia-sql" doc:id="84ac6c14-d3df-45d4-a620-12bd4b602375" >
-		<set-variable value="#[now()]" doc:name="Inicio" doc:id="88b6f68b-26f4-44cd-8558-9fdd333e86e9" variableName="Inicio" />
-		<logger level="INFO" doc:name="Inicio de consulta" doc:id="20456d7c-7454-467f-91ee-c75f947e195a" message="Inicio de la consulta SQL: #[vars.Inicio]" />
-		<choice doc:name="Choice" doc:id="dc877b68-f48d-44a1-8ac5-5081869f8955" >
-			<when expression="#[vars.idProfesor == null or isEmpty(vars.idProfesor)]">
-				<http:request method="GET" doc:name="Request" doc:id="6a5a8be3-1c5a-4d58-872a-e8c145229747" config-ref="HTTP_Request_configuration" path="${requestConfig.path}/#[vars.idProfesor]"/>
-			</when>
-			<otherwise >
-				<http:request method="GET" doc:name="Request" doc:id="c96b8e7f-1396-427f-9bad-847868b6a68d" config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
-					<http:query-params ><![CDATA[#[output application/java
+	<sub-flow name="obtener-profesores-academia-sql"
+		doc:id="84ac6c14-d3df-45d4-a620-12bd4b602375">
+		<set-variable value="#[now()]" doc:name="Inicio"
+			doc:id="88b6f68b-26f4-44cd-8558-9fdd333e86e9" variableName="Inicio" />
+		<logger level="INFO" doc:name="Inicio de consulta"
+			doc:id="20456d7c-7454-467f-91ee-c75f947e195a"
+			message="Inicio de la consulta SQL: #[vars.Inicio]" />
+		<choice doc:name="Choice"
+			doc:id="dc877b68-f48d-44a1-8ac5-5081869f8955">
+			<when
+				expression="#[vars.idProfesor == null or isEmpty(vars.idProfesor)]">
+				<http:request method="GET" doc:name="Request"
+					doc:id="c96b8e7f-1396-427f-9bad-847868b6a68d"
+					config-ref="HTTP_Request_configuration"
+					path="${requestConfig.path}">
+					<http:query-params><![CDATA[#[output application/java
 ---
 {
 	start : vars.start,
 	limit : vars.limit
 }]]]></http:query-params>
 				</http:request>
+			</when>
+			<otherwise>
+				<http:request method="GET" doc:name="Request" doc:id="6a5a8be3-1c5a-4d58-872a-e8c145229747" config-ref="HTTP_Request_configuration" path='#["/professors/" ++ vars.idProfesor]' />
 			</otherwise>
 		</choice>
-		<set-variable value="#[now()]" doc:name="Fin" doc:id="194da3c2-ae31-4194-9f44-b91e36e1623d" variableName="Fin" />
-		<logger level="INFO" doc:name="Fin de consulta" doc:id="6cabfd88-8bc4-45c9-a510-f1bb7c9cc429" message="Inicio de la consulta SQL: #[vars.Fin]" />
-		<logger level="INFO" doc:name="Tiempo total de consulta" doc:id="09e84d06-6ecf-41ef-bc12-c9dad71af7ee" message="Tiempo total de la consulta #[(vars.Fin - vars.Inicio).secs]" />
+		<set-variable value="#[now()]" doc:name="Fin"
+			doc:id="194da3c2-ae31-4194-9f44-b91e36e1623d" variableName="Fin" />
+		<logger level="INFO" doc:name="Fin de consulta"
+			doc:id="6cabfd88-8bc4-45c9-a510-f1bb7c9cc429"
+			message="Inicio de la consulta SQL: #[vars.Fin]" />
+		<logger level="INFO" doc:name="Tiempo total de consulta"
+			doc:id="09e84d06-6ecf-41ef-bc12-c9dad71af7ee"
+			message="Tiempo total de la consulta #[(vars.Fin - vars.Inicio).secs]" />
 	</sub-flow>
 </mule>
