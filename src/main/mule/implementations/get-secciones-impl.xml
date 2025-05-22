@@ -11,7 +11,6 @@
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 
 	<flow name="get-secciones-impl-flow">
-		<logger level="INFO" doc:name="Inicio" message="Inicio" />
 
 		<flow-ref doc:name="validar-parametros-secciones"
 			name="validar-parametros-secciones" />
@@ -22,20 +21,19 @@
 		<choice doc:name="validar-respuesta-sql">
 			<when
 				expression="#[sizeOf(vars.bodySQLSecciones default []) == 0]">
-				<raise-error doc:name="Raise error"
+				<raise-error doc:name="CUSTOM:NOT_FOUND"
 					type="CUSTOM:NOT_FOUND"
 					description="No existe registros asociados a la consulta" />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Validación exitosa"
-					doc:id="42143d44-7287-49e3-9eb4-555009a16c38"
-					message="Validación exitosa." />
+				<logger level="INFO" doc:name="Log DB Query Result" doc:id="a1cc37d4-4063-4101-968b-a756449f15e9" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  "event": "db.query.result",&#10;  "flow": "get-secciones-impl-flow",&#10;  "correlationId": correlationId,&#10;  "rowCount": sizeOf(vars.bodySQLSecciones),&#10;}]' />
 			</otherwise>
 		</choice>
 
 		<set-variable variableName="listaSecciones" value="#[[]]"
 			doc:name="listaSecciones" />
 
+		<logger level="INFO" doc:name="Inicio de consulta" doc:id="731115dd-1a85-4946-aaba-a1e4d4fc062e" message='#["Inicio de la consulta SQL: " ++ now()]' />
 		<foreach collection="#[vars.bodySQLSecciones]"
 			doc:name="Enriquecer datos curso">
 			<db:select doc:name="Datos del curso"
@@ -109,6 +107,7 @@ var datos = if (!isEmpty(vars.datosCurso)) vars.datosCurso[0] else {}
 				doc:name="listaSecciones" />
 		</foreach>
 
+		<logger level="INFO" doc:name="Fin de consulta" doc:id="a4818aa4-aa39-41e1-a011-898ce0ac6426" message='#["Fin de la consulta SQL: " ++ now ()]' />
 		<ee:transform doc:name="Response /secciones">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
@@ -140,11 +139,10 @@ vars.listaSecciones
 	</flow>
 
 	<flow name="obtener-secciones-sql">
-		<logger level="INFO" doc:name="Logger antes SQL"
+		<logger level="INFO" doc:name="Params para la consulta"
 			message="pidm: #[vars.pidm], id: #[vars.id], periodo: #[vars.periodo], crn: #[vars.crn]" />
-		<try doc:name="Try">
-			<db:select doc:name="SQL secciones"
-				config-ref="Database_Config" target="bodySQLSecciones">
+		<logger level="INFO" doc:name="Inicio de consulta" doc:id="02d49a1f-7307-4197-bb73-ac99b19f6675" message='#["Inicio de la consulta SQL secciones: " ++ now()]' />
+		<db:select doc:name="SQL secciones" config-ref="Database_Config" target="bodySQLSecciones">
 				<db:sql><![CDATA[
 SELECT DISTINCT 
     SIRASGN.SIRASGN_TERM_CODE AS PERIODO,
@@ -174,16 +172,7 @@ WHERE
     periodo: vars.periodo
 }]]]></db:input-parameters>
 			</db:select>
-
-			<error-handler>
-				<on-error-propagate enableNotifications="true"
-					logException="true" doc:name="On Error Propagate"
-					type="DB:CONNECTIVITY">
-					<logger level="INFO" doc:name="Error SQL"
-						message="Error de conexión al consultar a la base de datos" />
-				</on-error-propagate>
-			</error-handler>
-		</try>
+		<logger level="INFO" doc:name="Fin de consulta" doc:id="a98fe916-236b-40b2-ba90-c28d136247e4" message='#["Fin de la consulta SQL secciones: " ++ now ()]' />
 	</flow>
 
 </mule>
