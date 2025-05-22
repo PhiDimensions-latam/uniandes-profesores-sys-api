@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="get-producto-impl-flow"
 		doc:id="5fc46700-7d5a-4880-9c2e-75e402ab2de5">
-		<logger level="INFO" doc:name="Info"
-			doc:id="38774580-d7eb-4d9c-be62-69946260637b" />
 		<flow-ref doc:name="validar-query-params-pofesores-producto"
 			doc:id="b576cbff-0c50-45e4-8521-da23843388a5"
 			name="validar-query-params-pofesores-producto" />
-		<http:request method="GET" doc:name="Request professors"
-			doc:id="a643edc7-1067-43a9-8338-77c2b4dbafcf"
-			config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
+		<logger level="INFO" doc:name="Inicio de consulta professors" doc:id="50cd8768-d366-4bfc-8c5d-003969db9a66" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a7ced90a-540f-4b47-b936-25367fcf50dc" millisBetweenRetries="2000">
+			<http:request method="GET" doc:name="Request professors" doc:id="a643edc7-1067-43a9-8338-77c2b4dbafcf" config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
 			<http:query-params><![CDATA[#[{
 	username: vars.login
 }]]]></http:query-params>
 		</http:request>
-		<logger level="INFO" doc:name="Payload professors"
-			doc:id="a2c81277-1221-4ecb-8c90-0c35df87ab21" message="#[payload]" />
-		<http:request method="GET" doc:name="Request products"
-			doc:id="bd4b4a2b-60b4-41c5-9d5e-392552e64b3b"
-			config-ref="HTTP_Request_configuration"
-			path="#[p('requestConfig.pathProducts') ++ '/' ++ payload.faculties[0].id]"/>
-		<logger level="INFO" doc:name="Payload products"
-			doc:id="8f3d008d-6786-4824-a8dd-b76a982a2fb7" message="#[payload]" />
+		</until-successful>
+		<logger level="INFO" doc:name="Fin de consulta professors" doc:id="73b890b6-d645-4888-9e96-660e8d9e6d92" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Inicio de consulta products" doc:id="c892ea7a-9e2c-49ee-a6dd-0fd04b244f2f" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a734b3b8-bcde-43e8-a248-d11dcff89767" millisBetweenRetries="2000" >
+			<http:request method="GET" doc:name="Request products" doc:id="bd4b4a2b-60b4-41c5-9d5e-392552e64b3b" config-ref="HTTP_Request_configuration" path="#[p('requestConfig.pathProducts') ++ '/' ++ payload.faculties[0].id]" />
+		</until-successful>
+		<logger level="INFO" doc:name="Fin de consulta products" doc:id="e7eaf334-18db-46fb-84a3-301b420367d7" message='#["Fin de la consulta SQL: " ++ now ()]' />
 	</flow>
 	<sub-flow name="validar-query-params-pofesores-producto"
 		doc:id="4cc52d18-9d26-432b-bbd3-e31920c73e25">
 		<choice doc:name="Validar id"
 			doc:id="ae34c98f-35eb-4699-bc2e-67b962861e6e">
-			<when
-				expression="#[!isEmpty(vars.login) and vars.login != null]">
-				<logger level="INFO" doc:name="Login validado "
-					doc:id="3c9f3803-0bbd-4246-99ab-a9b2c8f8fe74"
-					message="Login validado " />
+			<when expression="#[!isEmpty(vars.login) and vars.login != null]">
+				<logger level="INFO" doc:name="Log Params Validados" doc:id="31db5cf2-d429-4d56-9e71-3b9629612390" message='#[output application/json&#10;---&#10;{&#10;  "event": "query-params-validated",&#10;  "flow": "validar-query-params-pofesores-producto",&#10;  "correlationId": correlationId,&#10;  "parameters": {&#10;    "login": vars.login&#10;  }&#10;}]' />
 			</when>
 			<otherwise>
-				<raise-error doc:name="Error-parámetros-consulta "
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
 					doc:id="f548600a-d0cc-4382-877c-761dadcf599d"
 					type="CUSTOM:VALIDATION_ERROR"
 					description="Error en los parámetros de consulta cursos/activos" />
