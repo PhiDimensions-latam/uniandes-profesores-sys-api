@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
 
 
@@ -18,29 +19,25 @@
 		<flow-ref doc:name="validar-parametro-info"
 			doc:id="38000b93-e2a3-4d4d-86b5-5184db92fe18"
 			name="validar-parametro-info" />
-		<http:request method="GET"
-			config-ref="HTTP_Request_configuration"
-			doc:name="Llamar servicio PhD" path="${requestConfig.path}"
-			target="SQLInfo" sendBodyMode="ALWAYS">
+
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="7dfe4de3-a4e9-4767-b9cd-2757712c5eba" millisBetweenRetries="2000">
+			<http:request method="GET" config-ref="HTTP_Request_configuration" doc:name="Llamar servicio PhD" path="${requestConfig.path}" target="SQLInfo" sendBodyMode="ALWAYS">
 			<http:query-params><![CDATA[#[{
   username: vars.login
 }]]]></http:query-params>
 		</http:request>
-
-		<logger level="INFO" doc:name="Logger"
+		</until-successful>
+		<logger level="INFO" doc:name="SQL info"
 			doc:id="bd3ebf2c-14e9-411d-93df-f1bcd1e4021a"
 			message="#[output application/json --- vars.SQLInfo]" />
 		<choice doc:name="Validar total de estudiantes">
 			<when
 				expression="#[isEmpty(vars.SQLInfo.faculties) or sizeOf(vars.SQLInfo.faculties) == 0]">
-				<raise-error doc:name="Sin resultados"
+				<raise-error doc:name="CUSTOM:NOT_FOUND"
 					type="CUSTOM:NOT_FOUND"
 					description="No se encontraron estudiantes doctorales para los criterios dados." />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Respuesta valida"
-					doc:id="a5d0f8a3-34b9-42b6-a6f5-251151692ef4"
-					message="#[vars.SQLInfo]" />
 				<ee:transform doc:name="response /info"
 					doc:id="70ea11b6-17d4-44c8-bb4f-75c04df57cf5">
 					<ee:message>
