@@ -31,7 +31,7 @@
 		</choice>
 
 		<set-variable variableName="listaSecciones" value="#[[]]"
-			doc:name="listaSecciones" />
+			doc:name="Define listaSecciones" />
 
 		<logger level="INFO" doc:name="Inicio de consulta" doc:id="731115dd-1a85-4946-aaba-a1e4d4fc062e" message='#["Inicio de la consulta SQL: " ++ now()]' />
 		<foreach collection="#[vars.bodySQLSecciones]"
@@ -104,7 +104,7 @@ var datos = if (!isEmpty(vars.datosCurso)) vars.datosCurso[0] else {}
 
 			<set-variable variableName="listaSecciones"
 				value="#[(vars.listaSecciones default []) ++ [vars.seccionEnriquecida]]"
-				doc:name="listaSecciones" />
+				doc:name="Concatena en listaSecciones" />
 		</foreach>
 
 		<logger level="INFO" doc:name="Fin de consulta" doc:id="a4818aa4-aa39-41e1-a011-898ce0ac6426" message='#["Fin de la consulta SQL: " ++ now ()]' />

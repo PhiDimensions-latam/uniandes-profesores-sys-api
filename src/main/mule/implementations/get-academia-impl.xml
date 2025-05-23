@@ -43,9 +43,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	</sub-flow>
 	<sub-flow name="obtener-profesores-academia-sql"
 		doc:id="84ac6c14-d3df-45d4-a620-12bd4b602375">
-		<logger level="INFO" doc:name="Inicio de consulta"
-			doc:id="20456d7c-7454-467f-91ee-c75f947e195a"
-			message="Inicio de la consulta SQL: #[vars.Inicio]" />
+		<logger level="INFO" doc:name="Inicio de consulta" doc:id="45866ace-0eaf-4afa-aa01-f6eadebc350b" message='#["Inicio de la consulta SQL: " ++ now()]' />
 		<choice doc:name="Cosulta profesores"
 			doc:id="dc877b68-f48d-44a1-8ac5-5081869f8955">
 			<when
@@ -67,8 +65,6 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 				</until-successful>
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="Fin de consulta"
-			doc:id="6cabfd88-8bc4-45c9-a510-f1bb7c9cc429"
-			message="Inicio de la consulta SQL: #[vars.Fin]" />
+		<logger level="INFO" doc:name="Fin de consulta" doc:id="cc3a60b0-0606-408a-9ddc-2b0a980137ea" message='#["Fin de la consulta SQL: " ++ now ()]' />
 	</sub-flow>
 </mule>

@@ -20,6 +20,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 			doc:id="38000b93-e2a3-4d4d-86b5-5184db92fe18"
 			name="validar-parametro-info" />
 
+		<logger level="INFO" doc:name="Inicio de consulta" doc:id="2ce2c578-0f68-4aba-a9c6-0c2866e49a8f" message='#["Inicio de la consulta SQL: " ++ now()]' />
 		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="7dfe4de3-a4e9-4767-b9cd-2757712c5eba" millisBetweenRetries="2000">
 			<http:request method="GET" config-ref="HTTP_Request_configuration" doc:name="Llamar servicio PhD" path="${requestConfig.path}" target="SQLInfo" sendBodyMode="ALWAYS">
 			<http:query-params><![CDATA[#[{
@@ -27,7 +28,8 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 }]]]></http:query-params>
 		</http:request>
 		</until-successful>
-		<logger level="INFO" doc:name="SQL info"
+		<logger level="INFO" doc:name="Fin de consulta" doc:id="28972042-3cf2-4499-9dda-ea4c097e3d88" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Respuesta"
 			doc:id="bd3ebf2c-14e9-411d-93df-f1bcd1e4021a"
 			message="#[output application/json --- vars.SQLInfo]" />
 		<choice doc:name="Validar total de estudiantes">

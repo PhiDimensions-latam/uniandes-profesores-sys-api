@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<flow-ref doc:name="validar-query-params-pofesores-producto"
 			doc:id="b576cbff-0c50-45e4-8521-da23843388a5"
 			name="validar-query-params-pofesores-producto" />
-		<logger level="INFO" doc:name="Inicio de consulta professors" doc:id="50cd8768-d366-4bfc-8c5d-003969db9a66" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<logger level="INFO" doc:name="Inicio de consulta professors" doc:id="50cd8768-d366-4bfc-8c5d-003969db9a66" message='#["Inicio de la consulta SQL professors: " ++ now()]' />
 		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a7ced90a-540f-4b47-b936-25367fcf50dc" millisBetweenRetries="2000">
 			<http:request method="GET" doc:name="Request professors" doc:id="a643edc7-1067-43a9-8338-77c2b4dbafcf" config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
 			<http:query-params><![CDATA[#[{
@@ -20,12 +20,12 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 }]]]></http:query-params>
 		</http:request>
 		</until-successful>
-		<logger level="INFO" doc:name="Fin de consulta professors" doc:id="73b890b6-d645-4888-9e96-660e8d9e6d92" message='#["Fin de la consulta SQL: " ++ now ()]' />
-		<logger level="INFO" doc:name="Inicio de consulta products" doc:id="c892ea7a-9e2c-49ee-a6dd-0fd04b244f2f" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<logger level="INFO" doc:name="Fin de consulta professors" doc:id="73b890b6-d645-4888-9e96-660e8d9e6d92" message='#["Fin de la consulta SQL professors: " ++ now ()]' />
+		<logger level="INFO" doc:name="Inicio de consulta products" doc:id="c892ea7a-9e2c-49ee-a6dd-0fd04b244f2f" message='#["Inicio de la consulta SQL products: " ++ now()]' />
 		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a734b3b8-bcde-43e8-a248-d11dcff89767" millisBetweenRetries="2000" >
 			<http:request method="GET" doc:name="Request products" doc:id="bd4b4a2b-60b4-41c5-9d5e-392552e64b3b" config-ref="HTTP_Request_configuration" path="#[p('requestConfig.pathProducts') ++ '/' ++ payload.faculties[0].id]" />
 		</until-successful>
-		<logger level="INFO" doc:name="Fin de consulta products" doc:id="e7eaf334-18db-46fb-84a3-301b420367d7" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Fin de consulta products" doc:id="e7eaf334-18db-46fb-84a3-301b420367d7" message='#["Fin de la consulta SQL products: " ++ now ()]' />
 	</flow>
 	<sub-flow name="validar-query-params-pofesores-producto"
 		doc:id="4cc52d18-9d26-432b-bbd3-e31920c73e25">
