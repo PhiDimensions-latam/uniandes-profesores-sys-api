@@ -10,7 +10,8 @@
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
         http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-	<flow name="validar-pidm" doc:id="60135160-1631-4b44-9c31-2974c6ce09d8">
+	<flow name="validar-pidm"
+		doc:id="60135160-1631-4b44-9c31-2974c6ce09d8">
 
 		<!-- LOG DE ENTRADA -->
 		<logger level="INFO" doc:name="Logger Entrada PIDM"
@@ -31,36 +32,38 @@ else "slogin"                                      // Alfanumérico tipo usuario
 		</ee:transform>
 
 		<!-- CONSULTA SQL ÚNICA -->
-		<logger level="INFO" doc:name="Inicio de consulta" doc:id="fa8178de-9791-41b3-a137-829bf1165ed2" message='#["Inicio de la consulta SQL: " ++ now()]' />
-		<db:select doc:name="Obtener PIDM" config-ref="Database_Config" target="SPidm">
-				<db:sql><![CDATA[
-SELECT gobtpac_pidm AS PIDM
-FROM gobtpac
-WHERE gobtpac_ldap_user = :id
-  AND :tipo = 'slogin'
-UNION ALL
-SELECT spriden_pidm AS PIDM
-FROM spriden
-WHERE spriden_id = :id
-  AND :tipo = 'scodigo'
-UNION ALL
-SELECT spbpers_pidm AS PIDM
-FROM spbpers
-WHERE spbpers_ssn = :id
-  AND :tipo = 'snumerodocumento'
-				]]></db:sql>
-				<db:input-parameters><![CDATA[
-#[
-  {
-    id: vars.id,
-    tipo: vars.tipo
-  }
-]
-]]></db:input-parameters>
-			</db:select>
+		<logger level="INFO" doc:name="Inicio de consulta"
+			doc:id="fa8178de-9791-41b3-a137-829bf1165ed2"
+			message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<db:select doc:name="Obtener PIDM"
+			config-ref="Database_Config" target="SPidm">
+			<db:sql><![CDATA[
+SELECT DISTINCT pidm FROM (
+    SELECT gobtpac.gobtpac_pidm AS pidm
+    FROM gobtpac
+    WHERE gobtpac.gobtpac_ldap_user = :id
+
+    UNION
+
+    SELECT spriden.spriden_pidm AS pidm
+	FROM spriden
+	WHERE spriden.spriden_id = :id
+
+
+    UNION
+
+    SELECT spbpers.spbpers_pidm AS pidm
+    FROM spbpers
+    WHERE spbpers.spbpers_ssn = :id
+)
+]]></db:sql>
+			<db:input-parameters><![CDATA[#[{ id: vars.id }]]]></db:input-parameters>
+		</db:select>
 
 		<!-- VALIDACIÓN DEL RESULTADO -->
-		<logger level="INFO" doc:name="Fin de consulta" doc:id="f5235100-c53a-4b3a-92f1-b25cb45855c3" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Fin de consulta"
+			doc:id="f5235100-c53a-4b3a-92f1-b25cb45855c3"
+			message='#["Fin de la consulta SQL: " ++ now ()]' />
 		<choice doc:name="Validar resultado de PIDM">
 			<when expression="#[isEmpty(vars.SPidm)]">
 				<raise-error doc:name="NOT_FOUND"

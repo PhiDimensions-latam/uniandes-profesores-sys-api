@@ -3,14 +3,18 @@
 <mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:http-error="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="get-academia-impl-flow"
 		doc:id="826934d9-dd0d-422b-93a7-3a0aafa954b9">
+		<flow-ref doc:name="validar-idProfesor"
+			name="validar-idProfesor" />
 		<flow-ref doc:name="validar-start-limit"
 			doc:id="a68daa54-afcd-43a0-a4d7-d7a9b840c944"
 			name="validar-start-limit" />
@@ -26,7 +30,9 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 					description="No existe registros asociados a la consulta " />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Log DB Query Result" doc:id="b835e73e-723d-4685-a039-cfe5985c4037" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  "event": "db.query.result",&#10;  "flow": "get-academia-impl-flow",&#10;  "correlationId": correlationId,&#10;  "rowCount": sizeOf(payload),&#10;}]' />
+				<logger level="INFO" doc:name="Log DB Query Result"
+					doc:id="b835e73e-723d-4685-a039-cfe5985c4037"
+					message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  "event": "db.query.result",&#10;  "flow": "get-academia-impl-flow",&#10;  "correlationId": correlationId,&#10;  "rowCount": sizeOf(payload),&#10;}]' />
 			</otherwise>
 		</choice>
 	</flow>
@@ -43,28 +49,124 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	</sub-flow>
 	<sub-flow name="obtener-profesores-academia-sql"
 		doc:id="84ac6c14-d3df-45d4-a620-12bd4b602375">
-		<logger level="INFO" doc:name="Inicio de consulta" doc:id="45866ace-0eaf-4afa-aa01-f6eadebc350b" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<logger level="INFO" doc:name="Inicio de consulta"
+			doc:id="45866ace-0eaf-4afa-aa01-f6eadebc350b"
+			message='#["Inicio de la consulta SQL: " ++ now()]' />
 		<choice doc:name="Cosulta profesores"
 			doc:id="dc877b68-f48d-44a1-8ac5-5081869f8955">
 			<when
 				expression="#[vars.idProfesor == null or isEmpty(vars.idProfesor)]">
-				<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a5c82c66-29c6-4fad-b19a-c122036a9d78" millisBetweenRetries="2000" >
-					<http:request method="GET" doc:name="Request sin idProfesor" doc:id="c96b8e7f-1396-427f-9bad-847868b6a68d" config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
-					<http:query-params><![CDATA[#[output application/java
+				<until-successful maxRetries="2"
+					doc:name="Until Successful"
+					doc:id="a5c82c66-29c6-4fad-b19a-c122036a9d78"
+					millisBetweenRetries="2000">
+					<logger level="INFO" doc:name="ID para request remoto"
+						message='Se invoca el backend con ID: #[vars.idProfesor]' />
+					<http:request method="GET"
+						doc:name="Request sin idProfesor"
+						doc:id="c96b8e7f-1396-427f-9bad-847868b6a68d"
+						config-ref="HTTP_Request_configuration"
+						path="${requestConfig.path}">
+						<http:query-params><![CDATA[#[output application/java
 ---
 {
 	start : vars.start,
 	limit : vars.limit
 }]]]></http:query-params>
-				</http:request>
+					</http:request>
 				</until-successful>
 			</when>
 			<otherwise>
-				<until-successful maxRetries="2" doc:name="Until Successful" doc:id="78252e9a-2591-4448-9192-9ca624d2f1aa" millisBetweenRetries="2000" >
-					<http:request method="GET" doc:name="Request con idProfesor" doc:id="6a5a8be3-1c5a-4d58-872a-e8c145229747" config-ref="HTTP_Request_configuration" path='#["/professors/" ++ vars.idProfesor]' />
-				</until-successful>
+				<try doc:name="Try block">
+					<until-successful maxRetries="2"
+						millisBetweenRetries="2000" doc:name="Until Successful">
+						<http:request method="GET"
+							doc:name="Request con idProfesor"
+							config-ref="HTTP_Request_configuration"
+							path='#["/professors/" ++ vars.idProfesor]' />
+					</until-successful>
+
+					<error-handler>
+						<on-error-propagate enableNotifications="true"
+							logException="true" type="MULE:RETRY_EXHAUSTED">
+							<choice>
+								<when expression="#[vars.recurso == 'academia']">
+									<set-variable variableName="httpStatus"
+										value="404" />
+
+									<ee:transform
+										doc:name="Transformar respuesta de error a JSON">
+										<ee:message>
+											<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 404,
+  message: "HTTP GET on resource 'https://academia.uniandes.edu.co:443/WebServicesAcademy/api/professors/" ++ vars.idProfesorOriginal ++ "' failed: not found (404)."
+}]]></ee:set-payload>
+										</ee:message>
+									</ee:transform>
+
+									<raise-error type="CUSTOM:NOT_FOUND"
+										description="#[payload.message]" />
+								</when>
+
+								<otherwise>
+									<raise-error type="CUSTOM:NOT_FOUND"
+										description="No se encontró el profesor #[vars.idProfesor]" />
+								</otherwise>
+							</choice>
+						</on-error-propagate>
+					</error-handler>
+
+				</try>
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="Fin de consulta" doc:id="cc3a60b0-0606-408a-9ddc-2b0a980137ea" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Fin de consulta"
+			doc:id="cc3a60b0-0606-408a-9ddc-2b0a980137ea"
+			message='#["Fin de la consulta SQL: " ++ now ()]' />
 	</sub-flow>
+	<flow name="validar-idProfesor">
+		<logger level="INFO" doc:name="Validar IDProfesor recibido"
+			message='IDProfesor recibido: #[vars.idProfesor]' />
+
+		<choice doc:name="Detectar si es login (alfanumérico)">
+			<when
+				expression="#[!isEmpty(vars.idProfesor) and !((vars.idProfesor as String) matches /^[0-9]{3,}$/)]">
+				<set-variable variableName="idProfesorOriginal" value="#[vars.idProfesor]" doc:name="idProfesor"/>
+				
+				<db:select doc:name="Obtener ID numérico"
+					config-ref="Database_Config" target="resultado">
+					<db:sql><![CDATA[
+SELECT DISTINCT SPRIDEN.SPRIDEN_ID AS ID
+FROM SPRIDEN
+LEFT JOIN GOBTPAC ON SPRIDEN.SPRIDEN_PIDM = GOBTPAC.GOBTPAC_PIDM
+WHERE GOBTPAC.GOBTPAC_LDAP_USER = :idLogin
+AND SPRIDEN.SPRIDEN_CHANGE_IND IS NULL
+AND SPRIDEN.SPRIDEN_NTYP_CODE IS NULL
+]]></db:sql>
+					<db:input-parameters><![CDATA[#[{ idLogin: vars.idProfesor }]]]></db:input-parameters>
+				</db:select>
+
+				<choice>
+					<when expression="#[isEmpty(vars.resultado)]">
+						<raise-error type="CUSTOM:NOT_FOUND"
+							description="#['No se encontró el profesor ' ++ vars.idProfesor]" />
+					</when>
+					<otherwise>
+						<set-variable variableName="idProfesor"
+							value="#[vars.resultado[0].ID]" doc:name="resultadoID"/>
+						<logger level="INFO" doc:name="ID convertido"
+							message='Login #[vars.idProfesor] convertido a ID #[vars.resultado[0].ID]' />
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise>
+				<logger level="INFO"
+					doc:name="ID es numérico, no se transforma"
+					message='ID #[vars.idProfesor] es numérico, continúa igual.' />
+			</otherwise>
+		</choice>
+	</flow>
+
 </mule>

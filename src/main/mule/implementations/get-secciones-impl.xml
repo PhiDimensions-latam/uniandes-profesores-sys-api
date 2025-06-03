@@ -96,8 +96,8 @@ var datos = if (!isEmpty(vars.datosCurso)) vars.datosCurso[0] else {}
   nombreCurso: (datos.NOMBRE_CURSO default null) as String,
   nombreCursoLargo: (datos.NOMBRE_CURSO_LARGO default null) as String,
   materia: (datos.MATERIA default null) as String,
-  numero: (datos.NUMERO default null) as String,
-  seccion: (datos.SECCION default null) as String
+  seccion: (datos.SECCION default null) as String,
+  numero: (datos.NUMERO default null) as String
 }]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
