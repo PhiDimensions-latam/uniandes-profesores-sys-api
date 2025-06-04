@@ -36,6 +36,30 @@
 							<groupId>com.oracle.ojdbc</groupId>
 							<artifactId>ojdbc8</artifactId>
 						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-config</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-core</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-context</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-beans</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-crypto</artifactId>
+						</sharedLibrary>
+						<sharedLibrary>
+							<groupId>org.springframework</groupId>
+							<artifactId>spring-core</artifactId>
+						</sharedLibrary>
 					</sharedLibraries>
 				</configuration>
 			</plugin>
@@ -84,6 +108,42 @@
 			<artifactId>mule-db-connector</artifactId>
 			<version>1.14.14</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-spring-module</artifactId>
+			<version>1.5.0</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>5.8.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>5.8.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>5.3.34</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>5.3.34</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+			<version>5.8.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.3.34</version>
 		</dependency>
 	</dependencies>
 
