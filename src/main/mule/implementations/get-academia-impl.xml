@@ -77,20 +77,13 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 				</until-successful>
 			</when>
 			<otherwise>
-				<try doc:name="Try block">
-					<until-successful maxRetries="2"
-						millisBetweenRetries="2000" doc:name="Until Successful">
-						<http:request method="GET"
-							doc:name="Request con idProfesor"
-							config-ref="HTTP_Request_configuration"
-							path='#["/professors/" ++ vars.idProfesor]' />
-					</until-successful>
+				<!-- [STUDIO:"Try block"]<try doc:name="Try block">
 
 					<error-handler>
 						<on-error-propagate enableNotifications="true"
 							logException="true" type="MULE:RETRY_EXHAUSTED">
 							<choice>
-								<when expression="#[vars.recurso == 'academia']">
+								<when expression="#[vars.recurso == 'academia'&#93;">
 									<set-variable variableName="httpStatus"
 										value="404" />
 
@@ -99,27 +92,30 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 										<ee:message>
 											<ee:set-payload><![CDATA[%dw 2.0
 output application/json
----
+&#45;&#45;-
 {
   code: 404,
   message: "HTTP GET on resource 'https://academia.uniandes.edu.co:443/WebServicesAcademy/api/professors/" ++ vars.idProfesorOriginal ++ "' failed: not found (404)."
-}]]></ee:set-payload>
+}&#93;&#93;></ee:set-payload>
 										</ee:message>
 									</ee:transform>
 
 									<raise-error type="CUSTOM:NOT_FOUND"
-										description="#[payload.message]" />
+										description="#[payload.message&#93;" />
 								</when>
 
 								<otherwise>
 									<raise-error type="CUSTOM:NOT_FOUND"
-										description="No se encontró el profesor #[vars.idProfesor]" />
+										description="No se encontró el profesor #[vars.idProfesor&#93;" />
 								</otherwise>
 							</choice>
 						</on-error-propagate>
 					</error-handler>
 
-				</try>
+				</try> [STUDIO] -->
+				<until-successful maxRetries="2" millisBetweenRetries="2000" doc:name="Until Successful">
+						<http:request method="GET" doc:name="Request con idProfesor" config-ref="HTTP_Request_configuration" path='#["/professors/" ++ vars.idProfesor]' />
+					</until-successful>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="Fin de consulta"

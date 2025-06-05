@@ -169,7 +169,7 @@ output application/json
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
-payload.code]]></ee:set-variable>
+payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
@@ -197,7 +197,7 @@ output application/json
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
-payload.code]]></ee:set-variable>
+payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
@@ -225,7 +225,7 @@ output application/json
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
-payload.code]]></ee:set-variable>
+payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
@@ -254,7 +254,7 @@ output application/json
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
-payload.code]]></ee:set-variable>
+payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
@@ -283,7 +283,7 @@ output application/json
 					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
-payload.code]]></ee:set-variable>
+payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
