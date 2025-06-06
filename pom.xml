@@ -99,11 +99,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle.ojdbc</groupId>
-			<artifactId>ojdbc8</artifactId>
-			<version>19.3.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-db-connector</artifactId>
 			<version>1.14.14</version>
@@ -145,9 +140,19 @@
 			<artifactId>spring-core</artifactId>
 			<version>5.3.34</version>
 		</dependency>
+		<dependency>
+			<groupId>com.oracle.ojdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>19.3.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo1.maven.org/maven2</url>
+		</repository>
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>Anypoint Exchange</name>

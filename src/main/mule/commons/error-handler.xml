@@ -6,281 +6,262 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-
-	<error-handler name="errorError_Handler"
-		doc:id="b7db8307-a7a2-4706-995a-f5c0fb9d4554">
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="e6e5e7d0-c8ee-45ab-9718-4ed960742bc3"
-			type="APIKIT:BAD_REQUEST">
-			<ee:transform doc:name="Transform Message"
-				doc:id="98b81080-8f1b-4888-99a4-f33bc26168d4">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+	<error-handler name="errorError_Handler" doc:id="f36e5490-4df6-4cbf-92ec-b310b5318489" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9a1069a2-d2f3-4f66-9ea8-618506841b31" type="APIKIT:BAD_REQUEST" >
+			<ee:transform doc:name="BAD_REQUEST" doc:id="27758f64-2971-4551-9a7b-c277cb844c2b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-    "error": {
-        "codigo": "400",
-        "mensaje": "Bad request"
-    }
+  "error": {
+    "codigo": "400",
+    "mensaje": "Bad request",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="4630b394-b03e-4ab8-ad10-2e0f62d8f104" type="APIKIT:NOT_FOUND">
-			<ee:transform doc:name="Transform Message"
-				doc:id="a1ee5198-68eb-407b-a8d2-04e878938ddc">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6e5ecba1-8854-4f53-9d6e-375ab4184310" type="APIKIT:NOT_FOUND" >
+			<ee:transform doc:name="NOT_FOUND" doc:id="32a97fbe-6e01-4049-9a6a-dfce6ffa7a29" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-    "error": {
-        "codigo": "404",
-        "mensaje": "Resource not found"
-    }
+  "error": {
+    "codigo": "404",
+    "mensaje": "Resource not found",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="14598ce5-0a2a-4a03-b177-c7885ddd18b0"
-			type="APIKIT:METHOD_NOT_ALLOWED">
-			<ee:transform doc:name="Transform Message"
-				doc:id="098b4d70-db9d-4303-b518-5377cf75e6fe">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="af580d92-1df5-41e3-9d0e-323571d024c7" type="APIKIT:METHOD_NOT_ALLOWED" >
+			<ee:transform doc:name="METHOD_NOT_ALLOWED" doc:id="7a4d84ae-d5dc-4305-8cf9-6fa597e4b61b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-    "error": {
-        "codigo": "405",
-        "mensaje": "Method not allowed"
-    }
+  "error": {
+    "codigo": "405",
+    "mensaje": "Method not allowed",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="485ff9a7-f726-4830-ae3e-306b4be85714"
-			type="APIKIT:NOT_ACCEPTABLE">
-			<ee:transform doc:name="Transform Message"
-				doc:id="18be0c0c-02be-4260-b593-cda74b590816">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1ad3a6ef-507d-4107-a284-a1e002b50b13" type="APIKIT:NOT_ACCEPTABLE" >
+			<ee:transform doc:name="NOT_ACCEPTABLE" doc:id="f092dd88-403e-4209-ae55-724355763226" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	"error": {
-		"codigo": "406",
-		"mensaje": "Not acceptable"
-	}
+  "error": {
+    "codigo": "406",
+    "mensaje": "NOT_ACCEPTABLE",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="e0ddc367-c5a1-434f-82e5-86b7fb4b9778"
-			type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-			<ee:transform doc:name="Transform Message"
-				doc:id="7589e5ac-ac2d-4a9c-a933-cf4ae0e325e8">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="290ec440-a0fd-450a-bff5-715918976297" type="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+			<ee:transform doc:name="UNSUPPORTED_MEDIA_TYPE" doc:id="18e84603-2aa2-4d80-a16a-364dba2da2e4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-    "error": {
-        "codigo": "415",
-        "mensaje":  "Unsupported media type"
-    }
+  "error": {
+    "codigo": "415",
+    "mensaje": "Unsupported media type",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="b7c8d199-875d-4ff9-9e07-75c49fc8a17d"
-			type="APIKIT:NOT_IMPLEMENTED">
-			<ee:transform doc:name="Transform Message"
-				doc:id="86c35ea3-8b8f-406e-aae8-02544e78c319">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="77186742-278b-40b1-a7c4-cc798704ed3e" type="APIKIT:NOT_IMPLEMENTED" >
+			<ee:transform doc:name="NOT_IMPLEMENTED" doc:id="80a523c9-b6d6-4128-99e2-d91c65b63b11" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-
 {
-    "error": {
-        "codigo": "501",
-        "mensaje": "Not Implemented"
-    }
+  "error": {
+    "codigo": "501",
+    "mensaje": "Not Implemented",   
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="81cdd6c5-4216-46ca-87d1-745b786c1c99"
-			type="CUSTOM:VALIDATION_ERROR">
-			<ee:transform doc:name="BAD_REQUEST"
-				doc:id="09d3da16-0463-4be0-b06a-177a5bec55ef">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="48c9f8b8-23d9-4b2f-93fa-8f32d50ab6b0" type="CUSTOM:VALIDATION_ERROR" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="d55b1d18-d091-414b-89eb-b1d9f5974b70" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="VALIDATION_ERROR" doc:id="d9e1bd9b-4df5-4ddc-8004-60d3891651c6" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	error: {
-		codigo:  "400",
-		mensaje: error.description as String
-	}
+  "error": {
+    "codigo": "400",
+    "mensaje": error.description as String 
+  }
 }]]></ee:set-payload>
 				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-			<ee:transform doc:name="httpStatus"
-				doc:id="27152e36-6c89-4559-853d-7722b9fd3bea">
+			<ee:transform doc:name="httpStatus" doc:id="239a3c40-f05d-495c-9359-118a107fd91e" >
 				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="3be042d2-64ac-4384-9080-16404e7c03d1" type="CUSTOM:NOT_FOUND">
-			<ee:transform doc:name="NOT_FOUND"
-				doc:id="99cd6367-43b4-49a3-9229-764e37b12beb">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0d5dcdec-9447-406c-a48e-ff1e7aa36e72" type="CUSTOM:NOT_FOUND" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="218e2478-c63e-4454-9922-7ab96d3a222c" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="NOT_FOUND" doc:id="ee2aa859-849b-4dc0-87b7-ac9f11265901" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
 	error: {
-		codigo:  "404",
+		codigo: "404",
 		mensaje: error.description as String
 	}
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<ee:transform doc:name="httpStatus"
-				doc:id="de5ad374-2815-42b1-9a7e-5a1659f213bb">
+			<ee:transform doc:name="httpStatus" doc:id="80046b65-9247-4780-916c-fdb2dd95d4c1" >
 				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="1039c13f-b3f7-438d-b275-be04b6d5e582" type="DB:CONNECTIVITY">
-			<ee:transform doc:name="DB_CONNECTIVITY_ERROR"
-				doc:id="392ff5f4-d85b-4d98-8b41-93ddb276f641">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="21667363-b3a2-4429-a10e-5084c4629687" type="DB:CONNECTIVITY" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="be370494-7959-48af-874a-4a44d44a8d2c" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="DB:CONNECTIVITY" doc:id="b9179415-28f0-4fc9-9813-ed3d836182b0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
 	error: {
-		codigo:  "503",
+		codigo: "500",
 		mensaje: error.description as String
 	}
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<ee:transform doc:name="httpStatus"
-				doc:id="0048f0af-754f-4d41-8528-0d0a0aad2044">
+			<ee:transform doc:name="httpStatus" doc:id="67d96806-fe95-4632-b197-ee96bd253c79" >
 				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="6f1abc39-3c55-4036-b57d-d752083667b4"
-			type="DB:QUERY_EXECUTION">
-			<ee:transform doc:name="DB_QUERY_EXECUTION_ERROR"
-				doc:id="193eb152-cae5-4105-865d-09895fc12d71">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d107d126-3f63-43d5-8484-700298aebca0" type="DB:BAD_SQL_SYNTAX" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="4898a90b-fee5-48e9-8428-98bb140a3675" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="DB:BAD_SQL_SYNTAX" doc:id="f1849543-07d8-4e8a-9592-f1e9797cd8d4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
 	error: {
-		codigo:  "500",
+		codigo: "500",
 		mensaje: error.description as String
 	}
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<ee:transform doc:name="httpStatus"
-				doc:id="1c2d7402-a5ae-4519-b6bb-f1794cd15405">
+			<ee:transform doc:name="httpStatus" doc:id="332bc51a-9805-4ce0-b216-12fe6a481bf6" >
 				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.error.codigo]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
-			doc:id="5058de00-f182-4e49-8597-3dc8b031a972"
-			type="DB:BAD_SQL_SYNTAX">
-			<ee:transform doc:name="DB_BAD_SQL_SYNTAX_ERROR"
-				doc:id="b64a6d7d-5077-4289-95b0-2da843d6ac70">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="50f01a83-569a-4aa0-94c5-daf8e758f86b" type="HTTP:BASIC_AUTHENTICATION" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="13277d6d-3b8c-4683-8bdb-d2c649edacc0" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="BASIC_AUTHENTICATION" doc:id="682bd3ad-90c1-4f6a-816e-cbadc82b33d3" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
 	error: {
-		codigo:  "400",
+		codigo: "401",
 		mensaje: error.description as String
 	}
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
-			<ee:transform doc:name="httpStatus"
-				doc:id="15d31906-187c-4adb-bfd4-1df4505a469d">
+			<ee:transform doc:name="httpStatus" doc:id="f6f3c233-0f95-4493-8312-e56a817b94bb" >
 				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.error.codigo]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ef379339-2fd1-4933-becf-2fb2e4161c9f" type="DB:QUERY_EXECUTION" >
+			<logger level="ERROR" doc:name="Logger Error" doc:id="98c90814-1fef-4ed1-9925-3ed292d01634" message="Error: Solicitud incorrecta a la API" />
+			<ee:transform doc:name="DB:QUERY_EXECUTION" doc:id="6e2de933-9a33-4842-bc0f-fe895ccc711d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: {
+		codigo: "500",
+		mensaje: "PreparedStatementsCallback; SQL []; IO Error: Checksum fail; nested exception is java.sql.SQLRecoverableException: IO Error: Checksum fail"
+	}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<ee:transform doc:name="httpStatus" doc:id="39abb7d6-15b2-4a1d-b1ea-5f8a909c9f0f" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
 output application/json
 ---
 payload.error.codigo]]></ee:set-variable>

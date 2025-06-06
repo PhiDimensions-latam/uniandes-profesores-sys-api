@@ -97,34 +97,39 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<logger level="INFO" doc:name="Validar IDProfesor recibido"
 			message='IDProfesor recibido: #[vars.idProfesor]' />
 
+		<set-variable variableName="idProfesorOriginal" value="#[vars.idProfesor]" doc:name="idProfesor" />
 		<choice doc:name="Detectar si es login (alfanumérico)">
-			<when
-				expression="#[!isEmpty(vars.idProfesor) and !((vars.idProfesor as String) matches /^[0-9]{3,}$/)]">
-				<set-variable variableName="idProfesorOriginal" value="#[vars.idProfesor]" doc:name="idProfesor"/>
-				
-				<db:select doc:name="Obtener ID numérico"
-					config-ref="Database_Config" target="resultado">
-					<db:sql><![CDATA[
-SELECT DISTINCT SPRIDEN.SPRIDEN_ID AS ID
-FROM SPRIDEN
-LEFT JOIN GOBTPAC ON SPRIDEN.SPRIDEN_PIDM = GOBTPAC.GOBTPAC_PIDM
-WHERE GOBTPAC.GOBTPAC_LDAP_USER = :idLogin
-AND SPRIDEN.SPRIDEN_CHANGE_IND IS NULL
-AND SPRIDEN.SPRIDEN_NTYP_CODE IS NULL
-]]></db:sql>
-					<db:input-parameters><![CDATA[#[{ idLogin: vars.idProfesor }]]]></db:input-parameters>
-				</db:select>
+			<when expression="#[(vars.idProfesor matches /^(?=.*[A-Za-z])[A-Za-z0-9]+$/) or (vars.idProfesor matches /^[0-9]{5,}$/)]">
+				<db:select doc:name="Obtener PIDM" doc:id="d32c4c5a-f4f9-49a4-a971-7a06ba17faa4" config-ref="Database_Config" target="resultado" >
+					<db:sql ><![CDATA[
+SELECT DISTINCT pidm FROM (
+    SELECT gobtpac.gobtpac_pidm AS pidm
+    FROM gobtpac
+    WHERE gobtpac.gobtpac_ldap_user = :id
 
-				<choice doc:name="Validar resultado de id">
-					<when expression="#[isEmpty(vars.resultado)]">
-						<raise-error type="CUSTOM:NOT_FOUND"
-							description="Recurso no encontrado" doc:name="CUSTOM:NOT_FOUND"/>
+    UNION
+
+    SELECT spriden.spriden_pidm AS pidm
+	FROM spriden
+	WHERE spriden.spriden_id = :id
+
+
+    UNION
+
+    SELECT spbpers.spbpers_pidm AS pidm
+    FROM spbpers
+    WHERE spbpers.spbpers_ssn = :id
+)
+]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{ id: vars.idProfesor }]]]></db:input-parameters>
+				</db:select>
+				<choice doc:name="Validar resultado de id" doc:id="e4f4de6f-385a-4c62-b3e8-b249f7c6d0e8" >
+					<when expression="#[isEmpty(vars.resultado)]" >
+						<raise-error doc:name="CUSTOM:NOT_FOUND" doc:id="a5c2f95f-85ad-43ea-babe-86b37f239e60" type="CUSTOM:NOT_FOUND" description="Recurso no encontrado" />
 					</when>
-					<otherwise>
-						<set-variable variableName="idProfesor"
-							value="#[vars.resultado[0].ID]" doc:name="resultadoID"/>
-						<logger level="INFO" doc:name="ID convertido"
-							message='Login #[vars.idProfesor] convertido a ID #[vars.resultado[0].ID]' />
+					<otherwise >
+						<set-variable value="#[vars.resultado[0].ID]" doc:name="resultadoID" doc:id="b976858b-283a-40b0-b8e6-1824bdcd1ab6" variableName="idProfesor" />
+						<logger level="INFO" doc:name="ID convertido" doc:id="e764cdaf-e452-4651-9880-65dea3ec10a0" message="Login #[vars.idProfesor] convertido a ID #[vars.resultado[0].ID]" />
 					</otherwise>
 				</choice>
 			</when>
