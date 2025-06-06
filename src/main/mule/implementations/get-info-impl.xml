@@ -37,7 +37,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 				expression="#[isEmpty(vars.SQLInfo.faculties) or sizeOf(vars.SQLInfo.faculties) == 0]">
 				<raise-error doc:name="CUSTOM:NOT_FOUND"
 					type="CUSTOM:NOT_FOUND"
-					description="No se encontraron estudiantes doctorales para los criterios dados." />
+					description="El recurso no devuelve contenido" />
 			</when>
 			<otherwise>
 				<ee:transform doc:name="response /info"
@@ -60,7 +60,7 @@ vars.SQLInfo
 		<choice doc:name="Validar parámetro">
 			<when expression="#[isEmpty(vars.login)]">
 				<raise-error type="CUSTOM:VALIDATION_ERROR"
-					description="Se necesita el parámetro correspondiente a 'login' para realizar la petición."
+					description="Es necesario el campo requerido [login]"
 					doc:name="Error codeStudent" />
 			</when>
 
