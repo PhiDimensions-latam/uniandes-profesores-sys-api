@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 				<raise-error doc:name="CUSTOM:NOT_FOUND"
 					doc:id="da957d99-4b0f-4802-ae16-bea21e908461"
 					type="CUSTOM:NOT_FOUND"
-					description="No existe registros asociados a la consulta " />
+					description="Recurso no encontrado" />
 			</when>
 			<otherwise>
 				<logger level="INFO" doc:name="Log DB Query Result"
@@ -77,45 +77,16 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 				</until-successful>
 			</when>
 			<otherwise>
-				<!-- [STUDIO:"Try block"]<try doc:name="Try block">
-
-					<error-handler>
-						<on-error-propagate enableNotifications="true"
-							logException="true" type="MULE:RETRY_EXHAUSTED">
-							<choice>
-								<when expression="#[vars.recurso == 'academia'&#93;">
-									<set-variable variableName="httpStatus"
-										value="404" />
-
-									<ee:transform
-										doc:name="Transformar respuesta de error a JSON">
-										<ee:message>
-											<ee:set-payload><![CDATA[%dw 2.0
-output application/json
-&#45;&#45;-
-{
-  code: 404,
-  message: "HTTP GET on resource 'https://academia.uniandes.edu.co:443/WebServicesAcademy/api/professors/" ++ vars.idProfesorOriginal ++ "' failed: not found (404)."
-}&#93;&#93;></ee:set-payload>
-										</ee:message>
-									</ee:transform>
-
-									<raise-error type="CUSTOM:NOT_FOUND"
-										description="#[payload.message&#93;" />
-								</when>
-
-								<otherwise>
-									<raise-error type="CUSTOM:NOT_FOUND"
-										description="No se encontró el profesor #[vars.idProfesor&#93;" />
-								</otherwise>
-							</choice>
-						</on-error-propagate>
-					</error-handler>
-
-				</try> [STUDIO] -->
-				<until-successful maxRetries="2" millisBetweenRetries="2000" doc:name="Until Successful">
+				<try doc:name="Try" doc:id="a5125d69-54b0-4f17-8003-04c43bb06141" >
+					<until-successful maxRetries="2" millisBetweenRetries="2000" doc:name="Until Successful">
 						<http:request method="GET" doc:name="Request con idProfesor" config-ref="HTTP_Request_configuration" path='#["/professors/" ++ vars.idProfesor]' />
 					</until-successful>
+					<error-handler >
+						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c62a0454-e72e-46cb-bc2f-f6c253df5552" type="MULE:RETRY_EXHAUSTED">
+							<raise-error doc:name="CUSTOM:NOT_FOUND" doc:id="18d21e3b-4449-4d0d-bd2b-a16053cdc620" type="CUSTOM:NOT_FOUND" description="Recurso no encontrado"/>
+						</on-error-propagate>
+					</error-handler>
+				</try>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="Fin de consulta"
@@ -144,10 +115,10 @@ AND SPRIDEN.SPRIDEN_NTYP_CODE IS NULL
 					<db:input-parameters><![CDATA[#[{ idLogin: vars.idProfesor }]]]></db:input-parameters>
 				</db:select>
 
-				<choice>
+				<choice doc:name="Validar resultado de id">
 					<when expression="#[isEmpty(vars.resultado)]">
 						<raise-error type="CUSTOM:NOT_FOUND"
-							description="#['No se encontró el profesor ' ++ vars.idProfesor]" />
+							description="Recurso no encontrado" doc:name="CUSTOM:NOT_FOUND"/>
 					</when>
 					<otherwise>
 						<set-variable variableName="idProfesor"

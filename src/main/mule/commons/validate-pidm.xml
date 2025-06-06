@@ -68,7 +68,7 @@ SELECT DISTINCT pidm FROM (
 			<when expression="#[isEmpty(vars.SPidm)]">
 				<raise-error doc:name="NOT_FOUND"
 					type="CUSTOM:NOT_FOUND"
-					description="No se encontró PIDM para el ID proporcionado." />
+					description="Recurso no encontrado" />
 			</when>
 			<otherwise>
 				<set-variable variableName="pidm" doc:name="pidm"

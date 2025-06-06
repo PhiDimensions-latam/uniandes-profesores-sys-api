@@ -23,7 +23,7 @@
 				expression="#[sizeOf(vars.bodySQLSecciones default []) == 0]">
 				<raise-error doc:name="CUSTOM:NOT_FOUND"
 					type="CUSTOM:NOT_FOUND"
-					description="No existe registros asociados a la consulta" />
+					description="Recurso no encontrado" />
 			</when>
 			<otherwise>
 				<logger level="INFO" doc:name="Log DB Query Result" doc:id="a1cc37d4-4063-4101-968b-a756449f15e9" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  "event": "db.query.result",&#10;  "flow": "get-secciones-impl-flow",&#10;  "correlationId": correlationId,&#10;  "rowCount": sizeOf(vars.bodySQLSecciones),&#10;}]' />
@@ -124,12 +124,12 @@ vars.listaSecciones
 			<when expression="#[isEmpty(vars.id)]">
 				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
 					type="CUSTOM:VALIDATION_ERROR"
-					description="El parámetro 'id' es obligatorio para la consulta." />
+					description="Es necesario el campo requerido [id]" />
 			</when>
 			<when expression="#[isEmpty(vars.periodo)]">
 				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
 					type="CUSTOM:VALIDATION_ERROR"
-					description="El parámetro 'periodo' es obligatorio para la consulta." />
+					description="Es necesario el campo requerido [periodo]" />
 			</when>
 			<otherwise>
 				<logger level="INFO" doc:name="Parámetros validados"
