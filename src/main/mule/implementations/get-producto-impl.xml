@@ -23,7 +23,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<logger level="INFO" doc:name="Fin de consulta professors" doc:id="73b890b6-d645-4888-9e96-660e8d9e6d92" message='#["Fin de la consulta SQL professors: " ++ now ()]' />
 		<choice doc:name="Validar respuesta de primera consulta" doc:id="0bdae14a-f330-4572-b8c1-2d76b984605b" >
 			<when expression="#[sizeOf(payload.faculties) == 0]">
-				<raise-error doc:name="CUSTOM:VALIDATION_ERROR" doc:id="2af738fc-1274-41c8-b443-fb473c241de8" type="CUSTOM:VALIDATION_ERROR" description="Recurso no encontrado"/>
+				<raise-error doc:name="CUSTOM:NOT_FOUND" doc:id="2af738fc-1274-41c8-b443-fb473c241de8" type="CUSTOM:NOT_FOUND" description="Recurso no encontrado"/>
 			</when>
 			<otherwise >
 				<logger level="DEBUG" doc:name="Primera consulta validada" doc:id="2070f58f-ad6a-4d74-bc02-b7bf32e61f3b" message="Primera consulta validada"/>
