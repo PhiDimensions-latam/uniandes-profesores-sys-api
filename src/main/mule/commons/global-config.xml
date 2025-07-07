@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 	</http:listener-config>
 	<apikit:config
 		name="uniandes-profesores-sys-api-raml-config"
-		api="resource::1f8ff72e-d631-469d-978e-aa297c2266ca:uniandes-profesores-sys-api-raml:1.0.0:raml:zip:uniandes-profesores-sys-api-raml.raml"
+		api="resource::1f8ff72e-d631-469d-978e-aa297c2266ca:uniandes-profesores-sys-api-raml:1.0.1:raml:zip:uniandes-profesores-sys-api-raml.raml"
 		outboundHeadersMapName="outboundHeaders"
 		httpStatusVarName="httpStatus" />
 	<db:config name="Database_Config" doc:name="Database Config"

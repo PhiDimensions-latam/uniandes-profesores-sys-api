@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>1f8ff72e-d631-469d-978e-aa297c2266ca</groupId>
 			<artifactId>uniandes-profesores-sys-api-raml</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>

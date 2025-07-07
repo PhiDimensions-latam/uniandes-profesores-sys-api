@@ -23,12 +23,12 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 			</http:error-response>
 		</http:listener>
 		<choice doc:name="Choice" doc:id="5e0a046c-8baa-4c05-8afc-a75988e2c953">
-			<when expression="#[attributes.headers.authorization?]">
+			<when expression="#[attributes.headers.'x-enable-auth' == 'true']">
 				<http:basic-security-filter doc:name="Basic security filter" doc:id="7449b1b2-09aa-48fa-89b8-d4bb59556faa" realm="mule" />
 				<spring:authorization-filter doc:name="Authorization filter" doc:id="c6fe1ebb-2c89-4a37-b135-3b44466a48a5" requiredAuthorities="ROLE_ADMIN" />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Log basic auth Null" doc:id="b2792c4d-5e25-4641-a0aa-b50cfa2b50e8" message="#['Solicitud sin encabezado Authorization recibida en ' ++ attributes.requestPath ++ ' desde IP ' ++ attributes.remoteAddress ++ '. Acceso denegado: se requiere autenticación Basic.']" />
+				<logger level="INFO" doc:name="Log basic auth Null" doc:id="b2792c4d-5e25-4641-a0aa-b50cfa2b50e8" message="No se envia la solicitud de autenticacion basica con el conector spring, se autenticara por medio de API Manager" />
 			</otherwise>
 		</choice>
 		<apikit:router config-ref="uniandes-profesores-sys-api-raml-config" />
