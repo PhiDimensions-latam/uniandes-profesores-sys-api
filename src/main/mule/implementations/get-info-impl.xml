@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+
+
+	<flow name="get-info-impl-flow"
+		doc:name="Flujo - Informacion Doctoral por CodeStudent"
+		doc:id="b1f52edb-92ed-4c78-8f72-eae9ba4ec63a">
+
+		<flow-ref doc:name="validar-parametro-info"
+			doc:id="38000b93-e2a3-4d4d-86b5-5184db92fe18"
+			name="validar-parametro-info" />
+
+		<logger level="INFO" doc:name="Inicio de consulta" doc:id="2ce2c578-0f68-4aba-a9c6-0c2866e49a8f" message='#["Inicio de la consulta SQL: " ++ now()]' />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="7dfe4de3-a4e9-4767-b9cd-2757712c5eba" millisBetweenRetries="2000">
+			<http:request method="GET" config-ref="HTTP_Request_configuration" doc:name="Llamar servicio PhD" path="${requestConfig.path}" target="SQLInfo" sendBodyMode="ALWAYS">
+			<http:query-params><![CDATA[#[{
+  username: vars.login
+}]]]></http:query-params>
+		</http:request>
+		</until-successful>
+		<logger level="INFO" doc:name="Fin de consulta" doc:id="28972042-3cf2-4499-9dda-ea4c097e3d88" message='#["Fin de la consulta SQL: " ++ now ()]' />
+		<logger level="INFO" doc:name="Respuesta"
+			doc:id="bd3ebf2c-14e9-411d-93df-f1bcd1e4021a"
+			message="#[output application/json --- vars.SQLInfo]" />
+		<choice doc:name="Validar total de estudiantes">
+			<when
+				expression="#[isEmpty(vars.SQLInfo.faculties) or sizeOf(vars.SQLInfo.faculties) == 0]">
+				<raise-error doc:name="CUSTOM:NOT_FOUND"
+					type="CUSTOM:NOT_FOUND"
+					description="Recurso no encontrado" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="response /info"
+					doc:id="70ea11b6-17d4-44c8-bb4f-75c04df57cf5">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.SQLInfo
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+
+			</otherwise>
+
+		</choice>
+	</flow>
+	<flow name="validar-parametro-info"
+		doc:id="3278405b-5861-4fd5-8ff8-8045fc378535">
+		<choice doc:name="Validar parámetro">
+			<when expression="#[isEmpty(vars.login)]">
+				<raise-error type="CUSTOM:VALIDATION_ERROR"
+					description="Es necesario el campo requerido [login]"
+					doc:name="Error codeStudent" />
+			</when>
+
+			<otherwise>
+				<!-- Continúa con el flujo si pasa todas las validaciones -->
+				<logger level="INFO" doc:name="Validación Exitosa"
+					doc:id="51e01caf-abab-4422-8bc4-6b42ad75f87b"
+					message="Validación Exitosa" />
+			</otherwise>
+		</choice>
+
+	</flow>
+
+
+</mule>

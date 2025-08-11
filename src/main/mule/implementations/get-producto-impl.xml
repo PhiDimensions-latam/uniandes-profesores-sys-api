@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="get-producto-impl-flow"
+		doc:id="5fc46700-7d5a-4880-9c2e-75e402ab2de5">
+		<flow-ref doc:name="validar-query-params-pofesores-producto"
+			doc:id="b576cbff-0c50-45e4-8521-da23843388a5"
+			name="validar-query-params-pofesores-producto" />
+		<logger level="INFO" doc:name="Inicio de consulta professors" doc:id="50cd8768-d366-4bfc-8c5d-003969db9a66" message='#["Inicio de la consulta SQL professors: " ++ now()]' />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a7ced90a-540f-4b47-b936-25367fcf50dc" millisBetweenRetries="2000">
+			<http:request method="GET" doc:name="Request professors" doc:id="a643edc7-1067-43a9-8338-77c2b4dbafcf" config-ref="HTTP_Request_configuration" path="${requestConfig.path}">
+			<http:query-params><![CDATA[#[{
+	username: vars.login
+}]]]></http:query-params>
+		</http:request>
+		</until-successful>
+		<logger level="INFO" doc:name="Fin de consulta professors" doc:id="73b890b6-d645-4888-9e96-660e8d9e6d92" message='#["Fin de la consulta SQL professors: " ++ now ()]' />
+		<choice doc:name="Validar respuesta de primera consulta" doc:id="0bdae14a-f330-4572-b8c1-2d76b984605b" >
+			<when expression="#[sizeOf(payload.faculties) == 0]">
+				<raise-error doc:name="CUSTOM:NOT_FOUND" doc:id="2af738fc-1274-41c8-b443-fb473c241de8" type="CUSTOM:NOT_FOUND" description="Recurso no encontrado"/>
+			</when>
+			<otherwise >
+				<logger level="DEBUG" doc:name="Primera consulta validada" doc:id="2070f58f-ad6a-4d74-bc02-b7bf32e61f3b" message="Primera consulta validada"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Inicio de consulta products" doc:id="c892ea7a-9e2c-49ee-a6dd-0fd04b244f2f" message='#["Inicio de la consulta SQL products: " ++ now()]' />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="a734b3b8-bcde-43e8-a248-d11dcff89767" millisBetweenRetries="2000" >
+			<http:request method="GET" doc:name="Request products" doc:id="bd4b4a2b-60b4-41c5-9d5e-392552e64b3b" config-ref="HTTP_Request_configuration" path="#[p('requestConfig.pathProducts') ++ '/' ++ payload.faculties[0].id]" />
+		</until-successful>
+		<logger level="INFO" doc:name="Fin de consulta products" doc:id="e7eaf334-18db-46fb-84a3-301b420367d7" message='#["Fin de la consulta SQL products: " ++ now ()]' />
+	</flow>
+	<sub-flow name="validar-query-params-pofesores-producto"
+		doc:id="4cc52d18-9d26-432b-bbd3-e31920c73e25">
+		<choice doc:name="Validar login"
+			doc:id="ae34c98f-35eb-4699-bc2e-67b962861e6e">
+			<when expression="#[!isEmpty(vars.login) and vars.login != null]">
+				<logger level="INFO" doc:name="Log Params Validados" doc:id="31db5cf2-d429-4d56-9e71-3b9629612390" message='#[output application/json&#10;---&#10;{&#10;  "event": "query-params-validated",&#10;  "flow": "validar-query-params-pofesores-producto",&#10;  "correlationId": correlationId,&#10;  "parameters": {&#10;    "login": vars.login&#10;  }&#10;}]' />
+			</when>
+			<otherwise>
+				<raise-error doc:name="CUSTOM:VALIDATION_ERROR"
+					doc:id="f548600a-d0cc-4382-877c-761dadcf599d"
+					type="CUSTOM:VALIDATION_ERROR"
+					description="Es necesario el campo requerido [login]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>
