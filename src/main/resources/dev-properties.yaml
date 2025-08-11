@@ -1,3 +1,10 @@
+api:
+  port: "8082"
+  majorVersion: "v2"
+  groupId: '${api.groupId}'
+  artifactId: '${api.artifactId}'
+  version: '${api.version}'
+  
 dataBaseConfig:
   host: "occprodsbx19.uniandes.edu.co"
   port: "1571"

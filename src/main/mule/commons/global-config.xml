@@ -55,7 +55,7 @@ http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/s
 	<configuration-properties
 		doc:name="Configuration properties"
 		doc:id="83b27213-5800-4f83-8bbd-ea53339aaaeb"
-		file="properties/${env}-properties.yaml" />
+		file="${env}-properties.yaml" />
 	<configuration doc:name="Configuration"
 		doc:id="e419921a-7b7d-4b7b-baf5-f45725d2d96f"
 		defaultErrorHandler-ref="errorError_Handler" />
